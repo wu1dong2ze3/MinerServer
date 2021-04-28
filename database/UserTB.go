@@ -8,9 +8,9 @@ import (
 
 type User struct {
 	TableBase
-	Id   int
-	Name string
-	Pwd  string
+	Id   int    `gorm:"primary_key"`
+	Name string `gorm:"type:varchar(256);not null;"`
+	Pwd  string `gorm:"type:varchar(256);not null;"`
 }
 
 func (obj User) getDefaultData() []interface{} {
@@ -30,19 +30,20 @@ func NowUser() *User {
 	return &user
 }
 
-func UpdateUser(name string, pwd string, old string) error {
+func UpdateUser(pwd string, old string) (*User, error) {
 	user := NowUser()
-
-	if !utils.IsLetterAndNumber(user.Name) ||
-		!utils.IsLetterAndNumber(user.Pwd) ||
-		!utils.Len5_12(user.Name) ||
+	if !utils.IsLetterAndNumber(user.Pwd) ||
 		!utils.Len5_12(user.Pwd) ||
 		user.Pwd != old {
-		return UserPwdError
+		log.Println("UpdateUser check:", pwd, old, UserPwdError)
+		return user, UserPwdError
 	}
-	user.Name = name
 	user.Pwd = pwd
-	return GetInstance().DB().Save(user).Error
+	if err := GetInstance().DB().Model(user).Update("Pwd", pwd).Error; err != nil {
+		log.Println("UpdateUser Save:", pwd, old, user, UserPwdError)
+		return nil, err
+	}
+	return user, nil
 }
 
 func Verify(name string, pwd string) error {

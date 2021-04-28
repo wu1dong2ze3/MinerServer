@@ -17,11 +17,11 @@ type MinerBoardInfoResult struct {
 
 type BoardInfoSubResult struct {
 	Index            int    `json:"index"`
-	HashrateRealTime string `json:"hashrate_real_time"`
-	HashrateInTheory string `json:"hashrate_in_theory"`
-	HardwareErrs     int    `json:"hardware_errs"`
-	ReceiveNum       int    `json:"receive_num"`
-	RejectNum        int    `json:"reject_num"`
+	HashrateRealTime string `json:"hashrateRealTime"`
+	HashrateInTheory string `json:"hashrateInTheory"`
+	HardwareErrs     int    `json:"hardwareErrs"`
+	ReceiveNum       int    `json:"receiveNum"`
+	RejectNum        int    `json:"rejectNum"`
 	Temp             string `json:"temp"`
 	Status           int    `json:"status"`
 }

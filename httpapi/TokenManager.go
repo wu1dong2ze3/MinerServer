@@ -46,6 +46,11 @@ func (tkm TKM) Save(user string, pwd string) (string, error) {
 	return res, err
 
 }
+func (tkm TKM) Delete() {
+	mutex.Lock()
+	mToken = nil
+	defer mutex.Unlock()
+}
 
 func (tkm TKM) Token() string {
 	mutex.Lock()

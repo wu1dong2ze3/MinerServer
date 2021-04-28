@@ -19,7 +19,7 @@ func formatAsDate(t time.Time) string {
 var netManager *cgminer.NetManager
 var router *gin.Engine
 
-func main_() {
+func main22() {
 	netManager = cgminer.CreateInstanc("localhost:4028")
 	router = gin.Default()
 	router.Delims("{[{", "}]}")

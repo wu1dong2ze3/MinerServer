@@ -1,6 +1,7 @@
 package database
 
 import (
+	"example.com/m/v2/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
@@ -29,6 +30,13 @@ var err error = nil
 
 func (dbm DBM) DB() *gorm.DB {
 	if instance == nil {
+		path := utils.NowPath()
+		if path != "" {
+			path = path + "/" + dbname
+		} else {
+			path = dbname
+		}
+		log.Println("DB path=", path)
 		bFirst := false
 		dbfile, ferr := os.OpenFile(dbname, syscall.O_RDWR, 0755)
 		if ferr != nil {
@@ -37,7 +45,7 @@ func (dbm DBM) DB() *gorm.DB {
 			bFirst = false
 			err = dbfile.Close()
 		}
-		instance, err = gorm.Open("sqlite3", dbname)
+		instance, err = gorm.Open("sqlite3", path)
 		if err != nil {
 			log.Fatalln("Failure to create database! exist!")
 		}

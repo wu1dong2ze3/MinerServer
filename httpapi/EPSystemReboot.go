@@ -20,10 +20,10 @@ func (SystemReboot) GetSubPath() string {
 
 func (SystemReboot) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, SystemReboot{*BaseError(NoError)})
 		if _, err := shell.Reboot.Exec(); err != nil {
 			c.JSON(MinerRebootFailed.Code(), SystemReboot{*BaseError(MinerRebootFailed.Add(err))})
 			return
 		}
-		c.JSON(http.StatusOK, SystemReboot{*BaseError(NoError)})
 	}
 }

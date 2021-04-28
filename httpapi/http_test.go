@@ -180,12 +180,153 @@ func TestSystemNetInfo(t *testing.T) {
 		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
 	}
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/system/net/info", nil)
+	req, _ := http.NewRequest("POST", "/system/net/info", nil)
 	req.Header.Add("token", InstanceTKM().Token())
 	router.ServeHTTP(w, req)
 	respBody, _ := ioutil.ReadAll(w.Body)
 	res := SystemNetInfo{}
 	err := json.Unmarshal(respBody, &res)
 	log.Println("TestSystemNetInfo:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+func TestSystemNetUpdate(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/system/net/update", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemNetUpdate{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemNetUpdate:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestMinerModeInfo(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/system/mode/info", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := MinerModeInfo{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestMinerModeInfo:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestMinerModeUpdate(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/miner/mode/update", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := MinerModeUpdate{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("MinerModeUpdate:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestSystemOteInfo(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/system/ota/info", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemOteInfo{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemOteInfo:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestSystemReset(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/system/reset", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemReset{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemReset:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestSystemLog(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/system/log", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemLog{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemLog:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+
+func TestSystemUiTitleBar(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/system/ui/title_bar", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemUiTitleBar{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemUiTitleBar:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+func TestSystemHardwareVersion(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/system/hardware/version", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemHardwareVersion{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemUiTitleBar:", res, err)
+	assert.Equal(t, 200, w.Code)
+}
+func TestSystemHardwareStatus(t *testing.T) {
+	TestUserLogin(t)
+	if router == nil {
+		router, _ = InstanceEPM().Test(InstanceRT().GetDefault())
+	}
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/system/hardware/status", nil)
+	req.Header.Add("token", InstanceTKM().Token())
+	router.ServeHTTP(w, req)
+	respBody, _ := ioutil.ReadAll(w.Body)
+	res := SystemHardwareStatus{}
+	err := json.Unmarshal(respBody, &res)
+	log.Println("TestSystemUiTitleBar:", res, err)
 	assert.Equal(t, 200, w.Code)
 }

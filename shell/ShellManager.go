@@ -57,6 +57,44 @@ func (c Cmd) ExecCallBack(callBack CallBack) {
 	fmt.Println("execCommand", "end")
 }
 
+func (c Cmd) Params(params ...string) *Cmd {
+	for _, v := range params {
+		c.cmd = c.cmd + " " + v
+	}
+	return &c
+}
+
+//阻塞式通过回调处理返回
+func (c Cmd) ExecCallBackNoEOF(callBack CallBack) {
+	cmd := exec.Command("/bin/bash", "-c", c.cmd)
+	fmt.Println(cmd.Args)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		callBack("", err)
+		return
+	}
+	if err = cmd.Start(); err != nil {
+		callBack("", err)
+		return
+	}
+	reader := bufio.NewReader(stdout)
+	for {
+		line, err2 := reader.ReadString('\n')
+		if !callBack(line, err2) {
+			break
+		}
+		//除非主动退出，否则一直阻断
+		//if io.EOF == err2 {
+		//	break
+		//}
+	}
+	if err = cmd.Wait(); err != nil {
+		callBack("", err)
+		return
+	}
+	fmt.Println("execCommand", "end")
+}
+
 //不需要执行命令的结果与成功与否，执行命令马上就返回
 func exec_shell_no_result(command string) {
 	////处理启动参数，通过空格分离 如：setsid /home/luojing/gotest/src/test_main/iwatch/test/while_little &

@@ -15,14 +15,14 @@ type MinerPoolInfoResult struct {
 }
 
 type PoolInfoSubResult struct {
-	Index       int    `json:"index"`       //"index": 0,
-	Address     string `json:"address"`     //"address": "stratum+tcp://btc.ss.poolin.com:443",
-	Status      int    `json:"status"`      //"status": 1,
-	Name        string `json:"name"`        //"name": "zhiyuan.5x36",
-	Diff        string `json:"diff"`        //"diff": "262K",
-	Receive_num int    `json:"receive_num"` //"receive_num": 2344,
-	Reject_num  int    `json:"reject_num"`  //"reject_num": 1,
-	Ls_time     int64  `json:"ls_time"`     //"ls_time": 1663445224
+	Index      int    `json:"index"`      //"index": 0,
+	Address    string `json:"address"`    //"address": "stratum+tcp://btc.ss.poolin.com:443",
+	Status     int    `json:"status"`     //"status": 1,
+	Name       string `json:"name"`       //"name": "zhiyuan.5x36",
+	Diff       string `json:"diff"`       //"diff": "262K",
+	ReceiveNum int    `json:"receiveNum"` //"receive_num": 2344,
+	RejectNum  int    `json:"rejectNum"`  //"reject_num": 1,
+	LsTime     int64  `json:"lsTime"`     //"ls_time": 1663445224
 }
 
 func (MinerPoolInfo) GetType() int {

@@ -11,9 +11,8 @@ type UserUpdate struct {
 	Data UserUpdateResult `json:"data"`
 }
 type UserUpdatePost struct {
-	User string `json:"user"`
-	Pwd  string `json:"pwd"`
-	Old  string `json:"old_pwd"`
+	Pwd string `json:"newPwd"`
+	Old string `json:"oldPwd"`
 }
 
 type UserUpdateResult struct {
@@ -35,15 +34,15 @@ func (UserUpdate) GetHandle() gin.HandlerFunc {
 		var err error
 		if err = c.ShouldBindJSON(poster); err != nil {
 			//c.JSON(http.StatusOK, BaseError(PostJsonError))
-			poster.User = c.GetString("user")
-			poster.Pwd = c.GetString("pwd")
-			poster.Old = c.GetString("old_pwd")
+			poster.Pwd = c.GetString("newPwd")
+			poster.Old = c.GetString("oldPwd")
 		}
-		if err = database.UpdateUser(poster.User, poster.Pwd, poster.Old); err != nil {
+		var user *database.User
+		if user, err = database.UpdateUser(poster.Pwd, poster.Old); err != nil {
 			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
 			return
 		}
-		if token, err = InstanceTKM().Save(poster.User, poster.Pwd); err != nil {
+		if token, err = InstanceTKM().Save(user.Name, user.Pwd); err != nil {
 			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
 			return
 		}

@@ -18,7 +18,7 @@ type MinerFanInfoResult struct {
 type FanInfoSubResult struct {
 	Index  int `json:"index"`
 	Status int `json:"status"`
-	FanRpm int `json:"fan_rpm"`
+	FanRpm int `json:"fanRpm"`
 }
 
 func (MinerFanInfo) GetType() int {
