@@ -4,14 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"example.com/m/v2/cgminer/body"
+	"example.com/m/v2/errs"
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 )
 
 type Result struct {
 	H Head
-	R []*Body
+	R []Body
 }
 
 //{"STATUS":"S","When":1618385384,"Code":22,"Msg":"CGMiner versions","Description":"cgminer 2.8.7"}
@@ -29,6 +31,23 @@ type Body interface {
 
 var resultMap map[string]interface{}
 
+func (r Result) BindBody(res interface{}) *errs.CodeError {
+	if r.R == nil || len(r.R) <= 0 || res == nil {
+		return BodyDataError.AddByString("BindBody r.R ==nil || len(r.R)<=0 || res==nil error")
+	}
+	if reflect.TypeOf(res).Elem().Elem() != reflect.TypeOf(r.R[0]).Elem() {
+		log.Println("BindBody=", reflect.TypeOf(res).Elem().Elem(), reflect.TypeOf(r.R[0]).Elem())
+		return BodyDataError.AddByString("BindBody type error!")
+	}
+	resist := reflect.ValueOf(res).Elem()
+	for _, bodyOne := range r.R {
+		resist = reflect.Append(resist, reflect.ValueOf(bodyOne).Elem())
+	}
+	reflect.ValueOf(res).Elem().Set(resist)
+	fmt.Println("res", res, "resist", resist)
+	return nil
+}
+
 func Parse(jsonstr string) (*Result, error) {
 	var f interface{}
 	js := filter0(jsonstr)
@@ -43,7 +62,7 @@ func Parse(jsonstr string) (*Result, error) {
 	}
 	var head *Head
 	var error bool
-	var bodys *[]*Body
+	var bodys *[]Body
 
 	m := f.(map[string]interface{})
 	for k, v := range m {
@@ -75,7 +94,7 @@ func Parse(jsonstr string) (*Result, error) {
 		fmt.Println("body==nil json is:", jsonstr)
 		return nil, DataErrorNoBody
 	}
-	return &Result{*head, *bodys}, NoError
+	return &Result{*head, *bodys}, nil
 }
 
 func BodyMap() map[string]interface{} {
@@ -83,16 +102,17 @@ func BodyMap() map[string]interface{} {
 }
 func init() {
 	resultMap = make(map[string]interface{})
-	resultMap["version"] = &body.Version{}
-	resultMap["config"] = &body.Config{}
-	resultMap["summary"] = &body.Summary{}
-	resultMap["pools"] = &body.Pools{}
-	resultMap["devs"] = &body.Devs{}
-	resultMap["gpu"] = &body.Gpu{}
-	resultMap["stats"] = &body.Stats{}
-	resultMap["coin"] = &body.Coin{}
-	resultMap["check"] = &body.Check{}
-	resultMap["devdetails"] = &body.Devdetails{}
+	resultMap["version"] = body.Version{}
+	resultMap["config"] = body.Config{}
+	resultMap["summary"] = body.Summary{}
+	resultMap["pools"] = body.Pools{}
+	resultMap["devs"] = body.Devs{}
+	resultMap["gpu"] = body.Gpu{}
+	resultMap["stats"] = body.Stats{}
+	resultMap["coin"] = body.Coin{}
+	resultMap["check"] = body.Check{}
+	resultMap["devdetails"] = body.Devdetails{}
+	resultMap["asc"] = body.Asc{}
 }
 
 func filter0(in string) *[]byte {
@@ -117,7 +137,7 @@ func getHead(m []interface{}) (*Head, bool) {
 	return _head.Interface().(*Head), false
 }
 
-func getBody(key string, m []interface{}) (*[]*Body, bool) {
+func getBody(key string, m []interface{}) (*[]Body, bool) {
 	if len(m) < 1 {
 		fmt.Println("len(m)<=1 getBody is error")
 		return nil, true
@@ -128,7 +148,7 @@ func getBody(key string, m []interface{}) (*[]*Body, bool) {
 		fmt.Println("getBody:error type=nil,The map can't found the command,key is ", key)
 		return nil, true
 	}
-	bodys := make([]*Body, len(m))
+	bodys := make([]Body, len(m))
 	for index, _ := range m {
 		headmap := m[index].(map[string]interface{})
 		fmt.Println("body:", headmap)
@@ -142,7 +162,7 @@ func getBody(key string, m []interface{}) (*[]*Body, bool) {
 		body = _body.Interface().(Body)
 		fmt.Println("ptrbody:", body)
 		body.Check()
-		bodys[index] = &body
+		bodys[index] = body
 	}
 	return &bodys, false
 }

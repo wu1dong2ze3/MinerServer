@@ -22,6 +22,10 @@ func (c CodeError) Add(e error) *CodeError {
 	c.error = c.error + " :" + e.Error()
 	return &c
 }
+func (c CodeError) AddByString(s string) *CodeError {
+	c.error = c.error + " :" + s
+	return &c
+}
 
 func (c CodeError) Code() int {
 	return c.code

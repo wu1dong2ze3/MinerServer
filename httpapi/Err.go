@@ -11,6 +11,7 @@ var MinerRebootFailed = errs.Definition(427, "Miner reboot failed!")
 var PostJsonError = errs.Definition(502, "Request JSON error") //
 var NoUser = errs.Definition(503, "User is not logged in")     //
 var NoNetConfigFile = errs.Definition(504, "NoNetConfigFile")  //
+var FileUplaodFailed = errs.Definition(504, "FileUplaodFailed")
 
 var CreateWebSocketError = errs.Definition(505, "CreateWebSocketError") //
 var WebSocketError = errs.Definition(506, "error! this is a websocket url! ")

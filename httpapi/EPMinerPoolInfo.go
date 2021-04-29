@@ -1,7 +1,11 @@
 package httpapi
 
 import (
+	"example.com/m/v2/cgminer"
+	"example.com/m/v2/cgminer/body"
+	"example.com/m/v2/errs"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -33,15 +37,38 @@ func (MinerPoolInfo) GetSubPath() string {
 	return "/miner/pool/info"
 }
 
-//TODO 假数据
 func (MinerPoolInfo) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var err error
+		var errcode *errs.CodeError
+		var result *cgminer.Result
+		if result, errcode = cgminer.R(body.Pools{}.ApiCmd(), ""); errcode != nil {
+			c.JSON(http.StatusOK, *BaseError(errcode))
+			return
+		}
+		var bodys = make([]body.Pools, 0)
+		//需要传指针类型，因为body的内部是这个指针类型的切片
+		if err = result.BindBody(&bodys); err != nil {
+			c.JSON(http.StatusOK, *BaseError(cgminer.CGMinerError.Add(err)))
+			return
+		}
+		log.Println("bodys=", bodys, len(bodys))
+		resps := make([]PoolInfoSubResult, len(bodys))
+		for _, v := range bodys {
+			resps = append(resps, PoolInfoSubResult{
+				Index:      v.Pool + 1,
+				Address:    v.URL,
+				Status:     cgminer.StatusType(v.Status),
+				Name:       v.User,
+				Diff:       "这里没确定",
+				ReceiveNum: v.Accepted,
+				RejectNum:  v.Rejected,
+				LsTime:     int64(v.LastShareTime),
+			})
+		}
+
 		c.JSON(http.StatusOK, MinerPoolInfo{*BaseError(NoError),
-			MinerPoolInfoResult{[]PoolInfoSubResult{
-				{0, "stratum+tcp://btc.ss.poolin.com:443", 1, "zhiyuan.5x36", "262K", 2344, 1, 1663445224},
-				{1, "stratum+tcp://btc.ss.poolin.com:442", 0, "zhiyuan.5x33", "263K", 2341, 3, 1663445224},
-				{2, "stratum+tcp://btc.ss.poolin.com:441", 1, "zhiyuan.5x31", "261K", 0, 1, 1663445224},
-			}}})
+			MinerPoolInfoResult{resps}})
 	}
 }
 

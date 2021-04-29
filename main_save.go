@@ -1,72 +1,60 @@
 package main
 
 import (
-	"encoding/json"
 	"example.com/m/v2/cgminer"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"html/template"
-	"net/http"
-	"time"
-	//sqlite "github.com/mattn/go-sqlite3"
+	"example.com/m/v2/cgminer/body"
+	"log"
+	"reflect"
 )
 
-func formatAsDate(t time.Time) string {
-	year, month, day := t.Date()
-	return fmt.Sprintf("%d%02d/%02d", year, month, day)
+//func formatAsDate(t time.Time) string {
+//	year, month, day := t.Date()
+//	return fmt.Sprintf("%d%02d/%02d", year, month, day)
+//}
+//
+////var netManager *cgminer.NetManager
+////var router *gin.Engine
+//
+//func main22() {
+//	netManager = cgminer.CreateInstanc("localhost:4028")
+//	router = gin.Default()
+//	router.Delims("{[{", "}]}")
+//	router.SetFuncMap(template.FuncMap{
+//		"formatAsDate": formatAsDate,
+//	})
+//	router.LoadHTMLFiles("./testdata/template/raw.tmpl")
+//	router.GET("/raw", func(c *gin.Context) {
+//		c.HTML(http.StatusOK, "raw.tmpl", gin.H{
+//			"now": time.Date(2017, 07, 01, 0, 0, 0, 0, time.UTC),
+//		})
+//	})
+//	routerGet()
+//	router.Run(":8080")
+//}
+
+func main11() {
+	pools := make([]body.Pools, 0)
+	bodys := make([]cgminer.Body, 0)
+	var b cgminer.Body = body.Pools{User: "wdz"}
+	var c interface{}
+	c = b.(body.Pools)
+	bodys = append(bodys, b)
+	log.Println(c, reflect.TypeOf(c))
+	test(bodys, &pools)
+	log.Println(pools)
+
 }
 
-var netManager *cgminer.NetManager
-var router *gin.Engine
+func test(bodys []cgminer.Body, poolsPtr interface{}) {
+	log.Println("1", reflect.TypeOf(poolsPtr), reflect.TypeOf(poolsPtr).Elem(), reflect.TypeOf(poolsPtr).Elem().Elem())
 
-func main22() {
-	netManager = cgminer.CreateInstanc("localhost:4028")
-	router = gin.Default()
-	router.Delims("{[{", "}]}")
-	router.SetFuncMap(template.FuncMap{
-		"formatAsDate": formatAsDate,
-	})
-	router.LoadHTMLFiles("./testdata/template/raw.tmpl")
-	router.GET("/raw", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "raw.tmpl", gin.H{
-			"now": time.Date(2017, 07, 01, 0, 0, 0, 0, time.UTC),
-		})
-	})
-	routerGet()
-	router.Run(":8080")
-}
+	log.Println("2", reflect.TypeOf(bodys), reflect.TypeOf(bodys[0]), reflect.ValueOf(bodys[0]))
+	var p interface{}
+	p = bodys[0]
+	bbb := reflect.ValueOf(p).Convert(reflect.TypeOf(poolsPtr).Elem().Elem())
 
-func routerGet() {
-	for _, v := range cgminer.BodyMap() {
-		body := v.(cgminer.Body)
-		router.GET(cgminer.SubUrl+"/"+body.ApiCmd(), func(c *gin.Context) {
-			res := make(chan string)
-			errorCode := make(chan error)
-			fmt.Println("wdz" + body.ApiCmd())
-			p := c.DefaultQuery("param", "")
-			var data []byte
-			if p != "" {
-				data, _ = json.Marshal(cgminer.Create(body.ApiCmd(), p))
-			} else {
-				data, _ = json.Marshal(cgminer.Create(body.ApiCmd(), ""))
-			}
-			go netManager.TcpCommandSyncByByte(data, res, errorCode)
-			r := <-res
-			code := <-errorCode
-			c.JSON(200, r)
-			fmt.Println(code)
-			//if code == cgminer.NO_ERROR{
-			//	jsonRedult,error:=cgminer.Parse(r)
-			//	if error==cgminer.NO_ERROR {
-			//		fmt.Println(jsonRedult.H)
-			//		for i,v := range jsonRedult.R {
-			//			fmt.Println("B",i,"=",*v)
-			//		}
-			//	}else if code == cgminer.DataErrorNoBody{
-			//		fmt.Println(jsonRedult.H)
-			//	}
-			//}
-		})
-	}
-
+	log.Println("3", bbb)
+	ccc := reflect.Append(reflect.ValueOf(poolsPtr).Elem(), bbb)
+	log.Println(ccc)
+	reflect.ValueOf(poolsPtr).Elem().Set(ccc)
 }

@@ -26,7 +26,7 @@ func (epm EPM) Execute(eg *gin.Engine) error {
 	for _, v := range epArray {
 		epm.execute(eg, v)
 	}
-	return eg.Run(":8080")
+	return eg.Run(":9090")
 }
 func (epm EPM) Test(eg *gin.Engine) (*gin.Engine, error) {
 	log.Println("EPM Test")
@@ -95,5 +95,5 @@ func init() {
 		&MinerFanInfo{}, &MinerUserInfo{}, &MinerUserUpdate{}, &SystemNetInfo{},
 		&SystemNetUpdate{}, &MinerModeInfo{}, &MinerModeUpdate{}, &SystemOteInfo{},
 		&SystemReset{}, &SystemLog{}, &SystemUiTitleBar{}, &SystemHardwareVersion{},
-		&SystemHardwareStatus{}, &UserExit{}}
+		&SystemHardwareStatus{}, &UserExit{}, &SystemOtaUpgrade{}}
 }
