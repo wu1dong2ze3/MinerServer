@@ -4,9 +4,9 @@ import "fmt"
 
 type TestData struct {
 	TableBase
-	AAA int
-	BBB string
-	CCC string
+	AAA1 int
+	BBB2 string
+	CCC3 string
 }
 
 func (t TestData) getDefaultData() []interface{} {

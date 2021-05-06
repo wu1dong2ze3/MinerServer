@@ -6,6 +6,7 @@ type Summary struct {
 	Elapsed            int     `json:"Elapsed"`
 	Algorithm          string  `json:"Algorithm"`
 	MhsAv              float64 `json:"MHS av"`
+	MHS15m             float64 `json:"MHS 15m"`
 	FoundBlocks        int     `json:"Found Blocks"`
 	Getworks           int     `json:"Getworks"`
 	Accepted           int     `json:"Accepted"`
@@ -23,6 +24,8 @@ type Summary struct {
 	DifficultyAccepted float64 `json:"Difficulty Accepted"`
 	DifficultyRejected float64 `json:"Difficulty Rejected"`
 	DifficultyStale    float64 `json:"Difficulty Stale"`
+	DeviceRejected     float64 `json:"Device Rejected%"`
+	PoolRejected       float64 `json:"Pool Rejected%"`
 }
 
 func (v Summary) Check() bool {
@@ -43,11 +46,11 @@ func (v Summary) ApiCmd() string {
 	}],
 	"SUMMARY": [{
 		"Elapsed": 21761, //TODO 主面板 开机时间？
-		"MHS av": 171417.93, //TODO 主面板 实时算力？
+		"MHS av": 171417.93,
 		"MHS 5s": 169427.60,
 		"MHS 1m": 169147.79,
 		"MHS 5m": 168574.95,
-		"MHS 15m": 168175.38,
+		"MHS 15m": 168175.38, //TODO 主面板 实时算力
 		"Found Blocks": 0,
 		"Getworks": 962,
 		"Accepted": 3,
@@ -60,17 +63,18 @@ func (v Summary) ApiCmd() string {
 		"Local Work": 901579,
 		"Remote Failures": 0,
 		"Network Blocks": 42,
-		"Total MH": 3730288588.0000, //TODO 主面板 实时算力？
+		"Total MH": 3730288588.0000,
 		"Work Utility": 0.00,
 		"Difficulty Accepted": 24576.00000000,
 		"Difficulty Rejected": 65536.00000000,
 		"Difficulty Stale": 0.00000000,
 		"Best Share": 0,
 		"Device Hardware%": 0.0000,
-		"Device Rejected%": 0.0000, // 主面板 拒绝率
+		"Device Rejected%": 0.0000, //TODO 主面板 拒绝率
 		"Pool Rejected%": 72.7273,
 		"Pool Stale%": 0.0000,
 		"Last getwork": 1619619561//TODO 主面板 开机时间？
+      //TODO 矿机温度，取算力板平均温度
 	}],
 	"id": 1
 }

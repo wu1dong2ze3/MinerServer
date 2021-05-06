@@ -34,7 +34,7 @@ func (SystemHardwareStatus) GetSubPath() string {
 	return "/system/hardware/status"
 }
 
-//TODO 假数据
+//TODO 需要处理
 func (SystemHardwareStatus) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error

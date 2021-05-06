@@ -13,8 +13,8 @@ type MinerHashrate struct {
 	Data MinerHashrateResult `json:"data"`
 }
 type MinerHashratePost struct {
-	LastCollectionTime int64 `json:"lastCollectionTime"`
-	Type               int   `json:"type"`
+	SinceTime string `json:"sinceTime"` //"router_type": 1,
+	UntilTime string `json:"untilTime"` //"ip": "10.0.0.2",
 }
 
 type MinerHashrateResult struct {
@@ -47,8 +47,8 @@ func (MinerHashrate) GetHandle() gin.HandlerFunc {
 		var err error
 		if err = c.ShouldBindJSON(poster); err != nil {
 			//c.JSON(http.StatusOK, BaseError(PostJsonError))
-			poster.LastCollectionTime = c.GetInt64("lastCollectionTime")
-			poster.Type = c.GetInt("type")
+			//poster.SinceTime = c.GetInt64("sinceTime")
+			//poster.UntilTime = c.GetInt64("untilTime")
 		}
 		b, _ := json.Marshal(MinerHashrate{*BaseError(NoError),
 			MinerHashrateResult{HashrateSubResult{

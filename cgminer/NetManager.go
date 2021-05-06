@@ -3,7 +3,6 @@ package cgminer
 import (
 	"encoding/json"
 	"example.com/m/v2/errs"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
@@ -40,9 +39,10 @@ func R(cmd string, param string) (*Result, *errs.CodeError) {
 	if result, err = Parse(resultJson); err != nil {
 		return nil, CGMinerError.Add(err).AddByString("Parse error! ")
 	}
-	for i, v := range result.R {
-		fmt.Println("B", i, "=", v)
-	}
+	// 测试打印用
+	//for i, v := range result.R {
+	//	fmt.Println("B", i, "=", v)
+	//}
 	return result, nil
 }
 
@@ -78,7 +78,7 @@ func (nm *NM) tcpCommandByByte(data []byte, res chan string, cerr chan error) {
 	//接收响应
 	response, _ := ioutil.ReadAll(conn)
 	resRtr := string(response)
-	fmt.Println("TcpCommandSyncByByte: ", resRtr)
+	//fmt.Println("TcpCommandSyncByByte: ", resRtr)
 	message = resRtr
 }
 func (nm *NM) TcpCommandSync(cmd string) (string, error) {

@@ -1,6 +1,7 @@
 package database
 
 import (
+	"example.com/m/v2/shell"
 	"example.com/m/v2/utils"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3"
@@ -30,12 +31,7 @@ var err error = nil
 
 func (dbm DBM) DB() *gorm.DB {
 	if instance == nil {
-		path := utils.NowPath()
-		if path != "" {
-			path = path + "/" + dbname
-		} else {
-			path = dbname
-		}
+		path := getDBFilePath()
 		log.Println("DB path=", path)
 		bFirst := false
 		dbfile, ferr := os.OpenFile(dbname, syscall.O_RDWR, 0755)
@@ -68,18 +64,23 @@ func (dbm DBM) DB() *gorm.DB {
 	return instance
 }
 
+func (dbm DBM) Delete() {
+	instance.Close()
+	shell.RM.Params("-f " + getDBFilePath()).Exec()
+}
+
 func (dbm DBM) Close() {
 	if instance != nil {
 		err = instance.Close()
 		if err != nil {
-			log.Println("datebase close error!")
+			log.Println("datebase close error!", err)
 		}
 		instance = nil
 	}
 }
 
 func firstStart(db *gorm.DB) error {
-	allModels := []Table{&User{}, &TestData{}}
+	allModels := []Table{&User{}, &TestData{}, &PointList{}}
 	var err error = nil
 	for _, v := range allModels {
 		if err = CreateTable(db, v); err != nil {
@@ -96,4 +97,14 @@ func firstStart(db *gorm.DB) error {
 		}
 	}
 	return err
+}
+
+func getDBFilePath() string {
+	path := utils.NowPath()
+	if path != "" {
+		path = path + "/" + dbname
+	} else {
+		path = dbname
+	}
+	return path
 }

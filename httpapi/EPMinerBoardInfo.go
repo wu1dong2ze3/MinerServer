@@ -6,9 +6,8 @@ import (
 	"example.com/m/v2/errs"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
-	"strconv"
+	"time"
 )
 
 ///miner/board/info
@@ -43,23 +42,12 @@ func (MinerBoardInfo) GetSubPath() string {
 func (MinerBoardInfo) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var errcode *errs.CodeError
-		var config *body.Config
-		if config, errcode = cgminer.Config(); errcode != nil {
-			c.JSON(http.StatusOK, *BaseError(errcode))
-			return
-		}
-		log.Println(config)
-		if config.ASCCount <= 0 {
-			c.JSON(http.StatusOK, *BaseError(cgminer.CGMinerError.AddByString("asc count=0")))
-			return
-		}
 		var resList *[]body.Asc
-		if resList, errcode = getAscInfo(config.ASCCount); errcode != nil {
+		if resList, errcode = getAscInfo(); errcode != nil {
 			c.JSON(http.StatusOK, *BaseError(errcode.AddByString("getAscInfo error!")))
 			return
 		}
-
-		var subRes = make([]BoardInfoSubResult, config.ASCCount)
+		var subRes = make([]BoardInfoSubResult, len(*resList))
 		for _, v := range *resList {
 			subRes = append(subRes, BoardInfoSubResult{
 				Index:            v.ID + 1,
@@ -77,24 +65,16 @@ func (MinerBoardInfo) GetHandle() gin.HandlerFunc {
 	}
 }
 
-func getAscInfo(ascCount int) (*[]body.Asc, *errs.CodeError) {
-	var result *cgminer.Result
+func getAscInfo() (*[]body.Asc, *errs.CodeError) {
+	var resList *[]body.Asc
+	var inter interface{}
 	var errCode *errs.CodeError
-	var reslist = make([]body.Asc, ascCount)
-	for i := 0; i < ascCount; i++ {
-		var oneBody []body.Asc
-		if result, errCode = cgminer.R(body.Asc{}.ApiCmd(), strconv.Itoa(i)); errCode != nil {
-			return nil, errCode
-		}
-		if errCode = result.BindBody(&oneBody); errCode != nil {
-			return nil, errCode
-		}
-		if len(oneBody) != 1 {
-			return nil, cgminer.CGMinerError.AddByString("getAscInfo len(bodyAes)!=1 is " + strconv.Itoa(len(oneBody)))
-		}
-		reslist = append(reslist, oneBody[0])
+	//十秒内缓存
+	if inter, errCode = cgminer.GetMt().GetCache().Load(time.Duration(10) * time.Second); errCode != nil {
+		return nil, errCode
 	}
-	return &reslist, nil
+	resList = inter.(*[]body.Asc)
+	return resList, nil
 }
 
 /**

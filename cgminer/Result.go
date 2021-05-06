@@ -19,7 +19,7 @@ type Result struct {
 //{"STATUS":"S","When":1618385384,"Code":22,"Msg":"CGMiner versions","Description":"cgminer 2.8.7"}
 type Head struct {
 	STATUS      string
-	When        float64
+	When        int
 	Code        float64
 	Msg         string
 	Description string
@@ -44,7 +44,7 @@ func (r Result) BindBody(res interface{}) *errs.CodeError {
 		resist = reflect.Append(resist, reflect.ValueOf(bodyOne).Elem())
 	}
 	reflect.ValueOf(res).Elem().Set(resist)
-	fmt.Println("res", res, "resist", resist)
+	//fmt.Println("res", res, "resist", resist)
 	return nil
 }
 
@@ -113,6 +113,8 @@ func init() {
 	resultMap["check"] = body.Check{}
 	resultMap["devdetails"] = body.Devdetails{}
 	resultMap["asc"] = body.Asc{}
+	resultMap["addpool"] = body.AddPool{}
+	resultMap["removepool"] = body.RemovePool{}
 }
 
 func filter0(in string) *[]byte {
@@ -128,7 +130,7 @@ func getHead(m []interface{}) (*Head, bool) {
 		return nil, true
 	}
 	headmap := m[0].(map[string]interface{})
-	fmt.Println("head:", headmap)
+	//fmt.Println("head:", headmap)
 	_head := reflectNew(Head{})
 	for k, v := range headmap {
 		value := reflect.ValueOf(v)
@@ -151,16 +153,16 @@ func getBody(key string, m []interface{}) (*[]Body, bool) {
 	bodys := make([]Body, len(m))
 	for index, _ := range m {
 		headmap := m[index].(map[string]interface{})
-		fmt.Println("body:", headmap)
+		//fmt.Println("body:", headmap)
 		_body := reflectNew(tp)
 		for k, v := range headmap {
 			value := reflect.ValueOf(v)
 			setField(_body, k, value)
 		}
-		fmt.Println("_body:", _body)
+		//fmt.Println("_body:", _body)
 		var body Body
 		body = _body.Interface().(Body)
-		fmt.Println("ptrbody:", body)
+		//fmt.Println("ptrbody:", body)
 		body.Check()
 		bodys[index] = body
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"example.com/m/v2/cgminer"
+	"example.com/m/v2/database"
 	"example.com/m/v2/httpapi"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -14,11 +15,16 @@ var router *gin.Engine
 
 func main() {
 	nm = cgminer.GetInstance().Addr("localhost:4028")
+	mt := cgminer.GetMt()
+	mt.StartLoadMiner()
+	database.GetInstance().DB()
 	router = httpapi.InstanceRT().GetDefault()
 	routerGet()
 	if err := httpapi.InstanceEPM().Execute(router); err != nil {
 		log.Println("main", err)
 	}
+	mt.Stop()
+
 }
 
 func routerGet() {
