@@ -16,5 +16,6 @@ var FileUplaodFailed = errs.Definition(504, "FileUplaodFailed")
 var CreateWebSocketError = errs.Definition(505, "CreateWebSocketError") //
 var WebSocketError = errs.Definition(506, "error! this is a websocket url! ")
 var ParamError = errs.Definition(507, "param error! ")
-var CanNotLoadFile = errs.Definition(508, "CanNotLoadFile") //
+var CanNotLoadFile = errs.Definition(508, "CanNotLoadFile")         //
+var CgMinerDeviceError = errs.Definition(509, "CgMinerDeviceError") //
 var UnknowError = errs.Definition(999, "UnknowError")

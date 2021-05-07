@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+const DEADLINE = 24 //24小时
 type MT struct {
 	running chan bool
 	cache   *RCache
@@ -91,6 +92,19 @@ func (mt *MT) doTick() {
 		log.Println("SavePoints error!" + errcode.Error())
 		return
 	}
+	//删除过期数据
+	if errcode = database.DelPoints((int)(time.Now().Add(-time.Duration(DEADLINE) * time.Hour).Unix())); errcode != nil {
+		log.Println("DelPoints error!" + errcode.Error())
+		return
+	}
+
+	//测试1分钟过期数据
+	//log.Println("time DeadLine:", time.Now().Add(-time.Duration(1)*time.Minute).Unix())
+	//if errcode =database.DelPoints((int)(time.Now().Add(-time.Duration(1)*time.Minute).Unix()));errcode!=nil{
+	//	log.Println("DelPoints error!" + errcode.Error())
+	//	return
+	//}
+	///测试结束
 }
 func getAscInfo(ascCount int) (*[]body.Asc, int, *errs.CodeError) {
 	var result *Result
