@@ -47,20 +47,20 @@ func (MinerBoardInfo) GetHandle() gin.HandlerFunc {
 			c.JSON(http.StatusOK, *BaseError(errcode.AddByString("getAscInfo error!")))
 			return
 		}
-		var subRes = make([]BoardInfoSubResult, len(*resList))
+		var subRes = make([]BoardInfoSubResult, 0)
 		for _, v := range *resList {
 			subRes = append(subRes, BoardInfoSubResult{
-				Index:            v.ID + 1,
-				HashrateRealTime: "需要确认",
-				HashrateInTheory: "需要确认",
+				Index:            v.ID,
+				HashrateRealTime: fmt.Sprintf("%.1fGH/S", v.Mhs15M),
+				HashrateInTheory: "",
 				HardwareErrs:     v.HardwareErrors,
 				ReceiveNum:       v.Accepted,
 				RejectNum:        v.Rejected,
-				Temp:             fmt.Sprintf("%.1fC", v.Temperature),
+				Temp:             fmt.Sprintf("%.1f℃", v.Temperature),
 				Status:           cgminer.StatusType(v.Status),
 			})
 		}
-		c.JSON(http.StatusOK, MinerBoardInfo{*BaseError(NoError),
+		c.JSON(http.StatusOK, MinerBoardInfo{*BaseError(errs.NoError),
 			MinerBoardInfoResult{subRes}})
 	}
 }

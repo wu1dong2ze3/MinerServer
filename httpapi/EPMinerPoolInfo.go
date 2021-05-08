@@ -4,6 +4,7 @@ import (
 	"example.com/m/v2/cgminer"
 	"example.com/m/v2/cgminer/body"
 	"example.com/m/v2/errs"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -39,7 +40,6 @@ func (MinerPoolInfo) GetSubPath() string {
 
 func (MinerPoolInfo) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var err error
 		var errcode *errs.CodeError
 		var result *cgminer.Result
 		if result, errcode = cgminer.R(body.Pools{}.ApiCmd(), ""); errcode != nil {
@@ -48,67 +48,63 @@ func (MinerPoolInfo) GetHandle() gin.HandlerFunc {
 		}
 		var bodys = make([]body.Pools, 0)
 		//需要传指针类型，因为body的内部是这个指针类型的切片
-		if err = result.BindBody(&bodys); err != nil {
-			c.JSON(http.StatusOK, *BaseError(cgminer.CGMinerError.Add(err)))
+		if errcode = result.BindBody(&bodys); errcode != nil {
+			c.JSON(http.StatusOK, *BaseError(cgminer.CGMinerError.Add(errcode)))
 			return
 		}
 		log.Println("bodys=", bodys, len(bodys))
-		resps := make([]PoolInfoSubResult, len(bodys))
+		resps := make([]PoolInfoSubResult, 0)
 		for _, v := range bodys {
 			resps = append(resps, PoolInfoSubResult{
-				Index:      v.Pool + 1,
+				Index:      v.Pool,
 				Address:    v.URL,
 				Status:     cgminer.StatusType(v.Status),
 				Name:       v.User,
-				Diff:       "这里没确定",
+				Diff:       fmt.Sprintf("%.2fK", v.WorkDifficulty),
 				ReceiveNum: v.Accepted,
 				RejectNum:  v.Rejected,
 				LsTime:     int64(v.LastShareTime),
 			})
 		}
 
-		c.JSON(http.StatusOK, MinerPoolInfo{*BaseError(NoError),
+		c.JSON(http.StatusOK, MinerPoolInfo{*BaseError(errs.NoError),
 			MinerPoolInfoResult{resps}})
 	}
 }
 
 /**
 {
-  "code": 200,
-  "message": "成功",
-  "data": {
-    "pools": [
-      {
-        "index": 0,
-        "address": "stratum+tcp://btc.ss.poolin.com:443",
-        "status": 1,
-        "name": "zhiyuan.5x36",
-        "diff": "262K",
-        "receive_num": 2344,
-        "reject_num": 1,
-        "ls_time": 1663445224
-      },
-      {
-        "index": 1,
-        "address": "stratum+tcp://btc.ss.poolin.com:443",
-        "status": 1,
-        "name": "zhiyuan.5x37",
-        "diff": "262K",
-        "receive_num": 2344,
-        "reject_num": 1,
-        "ls_time": 1663445224
-      },
-      {
-        "index": 2,
-        "address": "stratum+tcp://btc.ss.poolin.com:443",
-        "status": 1,
-        "name": "zhiyuan.5x38",
-        "diff": "262K",
-        "receive_num": 2344,
-        "reject_num": 1,
-        "ls_time": 1663445224
-      }
-    ]
-  }
+	"code": 200,
+	"message": "",
+	"data": {
+		"pools": [{
+			"index": 1,
+			"address": "stratum+tcp://btc.ss.poolin.com:443",
+			"status": 0,
+			"name": "vansbtc.001",
+			"diff": "8192.00K",
+			"receiveNum": 1,
+			"rejectNum": 2,
+			"lsTime": 0
+		}, {
+			"index": 2,
+			"address": "stratum+tcp://btc.ss.poolin.com:25",
+			"status": 0,
+			"name": "vansbtc.002",
+			"diff": "65536.00K",
+			"receiveNum": 0,
+			"rejectNum": 0,
+			"lsTime": 0
+		}, {
+			"index": 3,
+			"address": "stratum+tcp://btc.ss.poolin.com:1883",
+			"status": 0,
+			"name": "vansbtc.003",
+			"diff": "65536.00K",
+			"receiveNum": 0,
+			"rejectNum": 0,
+			"lsTime": 0
+		}]
+	}
 }
 */

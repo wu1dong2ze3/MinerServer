@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"example.com/m/v2/errs"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -29,10 +30,10 @@ func (MinerModeUpdate) GetSubPath() string {
 //TODO 假数据
 func (MinerModeUpdate) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		post := MinerModeUpdatePost{}
+		post := &MinerModeUpdatePost{}
 		var frequency int
 		var voltage float64
-		if err := c.ShouldBindJSON(&post); err != nil {
+		if err := c.ShouldBindJSON(post); err != nil {
 			frequency = c.GetInt("frequency")
 			voltage = c.GetFloat64("voltage")
 		} else {
@@ -40,6 +41,6 @@ func (MinerModeUpdate) GetHandle() gin.HandlerFunc {
 			voltage = post.Voltage
 		}
 		log.Println("MinerModeUpdate", frequency, voltage)
-		c.JSON(http.StatusOK, MinerModeUpdate{*BaseError(NoError)})
+		c.JSON(http.StatusOK, MinerModeUpdate{*BaseError(errs.NoError)})
 	}
 }

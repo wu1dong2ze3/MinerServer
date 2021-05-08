@@ -68,7 +68,6 @@ func (mt *MT) doTick() {
 		log.Println("Error! cgminer config is null! Please check that the CGMiner service is open！ ")
 		return
 	}
-	log.Println(config)
 	if config.ASCCount <= 0 {
 		log.Println("Error! cgminer ASCCount is Zero! CGMiner service exception！ ")
 		return
@@ -86,7 +85,7 @@ func (mt *MT) doTick() {
 	for i, v := range *resList {
 		points[i] = v.Mhs15M
 	}
-	log.Println("config.ASCCount:", config.ASCCount)
+	log.Println("online Decice ASCCount:", config.ASCCount)
 	//保存数据库结果用于绘图
 	if errcode = database.SavePoints(when, &points); errcode != nil {
 		log.Println("SavePoints error!" + errcode.Error())

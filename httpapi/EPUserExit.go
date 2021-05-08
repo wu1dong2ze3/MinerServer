@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"example.com/m/v2/errs"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -24,6 +25,6 @@ func (UserExit) GetSubPath() string {
 func (UserExit) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		InstanceTKM().Delete()
-		c.JSON(http.StatusOK, UserExit{*BaseError(NoError)})
+		c.JSON(http.StatusOK, UserExit{*BaseError(errs.NoError)})
 	}
 }

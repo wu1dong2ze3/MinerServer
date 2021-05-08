@@ -22,7 +22,7 @@ type MinerSummaryResult struct {
 
 type SummarySubResult struct {
 	Hashrate   string `json:"hashrate"`   //"hashrate": "473.45 MH/s"
-	RunTime    string `json:"RunTime"`    //""duration": 1341242434, //运行时常
+	RunTime    string `json:"runTime"`    //""duration": 1341242434, //运行时常
 	RejectRate string `json:"rejectRate"` //""reject_rate": 0.12, //拒绝率 百分比
 	Temp       string `json:"temp"`       //""temp": "58C"//温度，暂时统一成摄氏度
 }
@@ -42,7 +42,7 @@ func (MinerSummary) GetHandle() gin.HandlerFunc {
 		var lang = c.GetHeader("lang")
 		var isCn = true
 		if result, errCode = cgminer.R(body.Summary{}.ApiCmd(), ""); errCode != nil {
-			c.JSON(http.StatusOK, *BaseError(cgminer.CGMinerError))
+			c.JSON(http.StatusOK, *BaseError(cgminer.CGMinerError.Add(errCode)))
 			return
 		}
 		var bodys = make([]body.Summary, 0)
@@ -61,7 +61,7 @@ func (MinerSummary) GetHandle() gin.HandlerFunc {
 		var hashrate = fmt.Sprintf("%.2fGH/s", bodys[0].MHS15m)
 		var timeElapsed = ""
 		if isCn == true {
-			timeElapsed = fmt.Sprintf("%d天 %d小时 %d分 %d秒", utils.DayBySecondRound(bodys[0].Elapsed), utils.HourBySecondMod(bodys[0].Elapsed), utils.MinBySecondMod(bodys[0].Elapsed), utils.SecondBySeccondMod(bodys[0].Elapsed))
+			timeElapsed = fmt.Sprintf("%d天 %d小时 %d分", utils.DayBySecondRound(bodys[0].Elapsed), utils.HourBySecondMod(bodys[0].Elapsed), utils.MinBySecondMod(bodys[0].Elapsed))
 		} else {
 			timeElapsed = fmt.Sprintf("%d days,%d hours,%d minutes and %d seconds", utils.DayBySecondRound(bodys[0].Elapsed), utils.HourBySecondMod(bodys[0].Elapsed), utils.MinBySecondMod(bodys[0].Elapsed), utils.SecondBySeccondMod(bodys[0].Elapsed))
 		}
@@ -70,7 +70,7 @@ func (MinerSummary) GetHandle() gin.HandlerFunc {
 		var timeStr = ""
 		if timeFloat, errCode := getTemp(); errCode != nil {
 		} else {
-			timeStr = fmt.Sprintf("%.2fC", timeFloat)
+			timeStr = fmt.Sprintf("%.2f"+`℃`, timeFloat)
 		}
 
 		c.JSON(http.StatusOK, MinerSummary{BaseJson{http.StatusOK, ""}, MinerSummaryResult{SummarySubResult{hashrate, timeElapsed, rejectRate, timeStr}}})

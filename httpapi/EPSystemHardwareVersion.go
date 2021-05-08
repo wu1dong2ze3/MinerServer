@@ -1,8 +1,10 @@
 package httpapi
 
 import (
+	"example.com/m/v2/shell"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 ///system/hardware/version
@@ -33,9 +35,13 @@ func (SystemHardwareVersion) GetSubPath() string {
 //TODO 假数据
 func (SystemHardwareVersion) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		shell.OS_RELEASE.ExecCallBack(func(out string, err error) (needContinue bool) {
+			strings.Contains(out, "")
+			return false
+		})
 		c.JSON(http.StatusOK, SystemHardwareVersion{BaseJson{http.StatusOK, ""},
 			SystemHardwareVersionResult{
-				HardwareVersionResult{"A10s", "g19", "a10s_20210108_053449", "2020-11-21 15:21"}}})
+				HardwareVersionResult{"测试数据A10s", "测试数据g19", "测试数据a10s_20210108_053449", "测试数据2020-11-21 15:21"}}})
 	}
 }
 

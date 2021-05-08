@@ -27,6 +27,7 @@ type Pools struct {
 	HasStratum          bool    `json:"Has Stratum"`
 	StratumActive       bool    `json:"Stratum Active"`
 	StratumURL          string  `json:"Stratum URL"`
+	WorkDifficulty      float64 `json:"Work Difficulty"`
 }
 
 func (v Pools) Check() bool {

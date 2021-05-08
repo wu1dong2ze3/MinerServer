@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"example.com/m/v2/errs"
 	"example.com/m/v2/shell"
 	"example.com/m/v2/utils"
 	"github.com/gin-gonic/gin"
@@ -48,7 +49,7 @@ func (SystemLog) GetHandle() gin.HandlerFunc {
 		_, err1 := time.Parse("2006-01-02 15:04:05", si)
 		_, err2 := time.Parse("2006-01-02 15:04:05", un)
 		if (err1 != nil && si != "") || (err2 != nil && un != "") {
-			c.JSON(ParamError.Code(), SystemLog{*BaseError(ParamError)})
+			c.JSON(errs.ParamsError.Code(), SystemLog{*BaseError(errs.ParamsError)})
 			return
 		}
 		if si != "" {

@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"example.com/m/v2/database"
+	"example.com/m/v2/errs"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -40,14 +41,14 @@ func (UserLogin) GetHandle() gin.HandlerFunc {
 			poster.Device = c.GetInt("device")
 		}
 		if err = database.Verify(poster.User, poster.Pwd); err != nil {
-			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
+			c.JSON(http.StatusOK, BaseError(database.UserPwdError))
 			return
 		}
 		var token = ""
 		if token, err = InstanceTKM().Save(poster.User, poster.Pwd); err != nil {
-			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
+			c.JSON(http.StatusOK, BaseError(database.UserPwdError))
 			return
 		}
-		c.JSON(http.StatusOK, UserLogin{*BaseError(NoError), UserLoginResult{token}})
+		c.JSON(http.StatusOK, UserLogin{*BaseError(errs.NoError), UserLoginResult{token}})
 	}
 }

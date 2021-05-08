@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 ///system/hardware/status
@@ -20,10 +21,12 @@ type SystemHardwareStatusResult struct {
 }
 
 type HardwareStatusResult struct {
-	Time string `json:"time"`
-	Cpu  string `json:"cpu"`
-	Ram  string `json:"ram"`
-	Rom  string `json:"rom"`
+	Time         string `json:"time"`
+	Cpu          int    `json:"cpu"`
+	AvailableRam int    `json:"availableRam"`
+	TotalRam     int    `json:"totalRam"`
+	AvailableRom int    `json:"availableRom"`
+	TotalRom     int    `json:"totalRom"`
 }
 
 func (SystemHardwareStatus) GetType() int {
@@ -34,30 +37,28 @@ func (SystemHardwareStatus) GetSubPath() string {
 	return "/system/hardware/status"
 }
 
-//TODO 需要处理
 func (SystemHardwareStatus) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var err error
 		var time, memAble, memtotal, cpu, rom string
-		var cpui int
 		if time, err = shell.SYSTEMTIME.Exec(); err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile))
+			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
 		if memAble, err = shell.MemAvailable.Exec(); err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile))
+			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
 		if memtotal, err = shell.MemTotal.Exec(); err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile))
+			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
 		if cpu, err = shell.SYSCPU.Exec(); err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile))
+			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
 		if rom, err = shell.SYSROM.Exec(); err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile))
+			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
 		time = utils.S{S: time}.NoBr().S
@@ -66,14 +67,52 @@ func (SystemHardwareStatus) GetHandle() gin.HandlerFunc {
 		cpu = utils.S{S: cpu}.NoAny("%").NoAny(`/bin/bash`).NoBr().NoQuot().S
 		rom = utils.S{S: rom}.Replace(" ", "/").NoBr().Flip("/").S
 		log.Println("cpu", cpu)
-		if cpui, err = strconv.Atoi(cpu); err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile.Add(err)))
+		romStr := strings.Split(rom, "/")
+		if len(romStr) != 2 {
+			c.JSON(http.StatusOK, *BaseError(ExeShellError.AddByString("len(romStr)!=2")))
 			return
 		}
-		cpu = strconv.Itoa(100-cpui) + "%"
 		c.JSON(http.StatusOK, SystemHardwareStatus{BaseJson{http.StatusOK, ""},
 			SystemHardwareStatusResult{
-				HardwareStatusResult{time, cpu, memAble + "/" + memtotal, rom}}})
+				HardwareStatusResult{time, 100 - UnifyUnits(cpu),
+					UnifyUnits(memAble),
+					UnifyUnits(memtotal),
+					UnifyUnits(romStr[0]),
+					UnifyUnits(romStr[1])}}})
+	}
+}
+
+func UnifyUnits(s string) int {
+	var err error
+	var f float64
+	var ss = ""
+	if strings.Contains(s, "kB") {
+		ss = utils.S{S: s}.NoAny("kB").S
+		if f, err = strconv.ParseFloat(ss, 4); err != nil {
+			log.Println("UnifyUnitsToKB error!")
+			return 0
+		}
+		return int(f)
+	} else if strings.Contains(s, "M") {
+		ss = utils.S{S: s}.NoAny("M").S
+		if f, err = strconv.ParseFloat(ss, 4); err != nil {
+			log.Println("UnifyUnitsToKB error!")
+			return 0
+		}
+		return int(f) * 1024
+	} else if strings.Contains(s, "G") {
+		ss = utils.S{S: s}.NoAny("G").S
+		if f, err = strconv.ParseFloat(ss, 4); err != nil {
+			log.Println("UnifyUnitsToKB error!")
+			return 0
+		}
+		return int(f) * 1024 * 1024
+	} else {
+		if f, err = strconv.ParseFloat(s, 4); err != nil {
+			log.Println("UnifyUnitsToKB error!")
+			return 0
+		}
+		return int(f)
 	}
 }
 

@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"example.com/m/v2/database"
+	"example.com/m/v2/errs"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -46,6 +47,6 @@ func (UserUpdate) GetHandle() gin.HandlerFunc {
 			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
 			return
 		}
-		c.JSON(http.StatusOK, UserUpdate{*BaseError(NoError), UserUpdateResult{token}})
+		c.JSON(http.StatusOK, UserUpdate{*BaseError(errs.NoError), UserUpdateResult{token}})
 	}
 }

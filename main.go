@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"example.com/m/v2/cgminer"
 	"example.com/m/v2/database"
+	"example.com/m/v2/errs"
 	"example.com/m/v2/httpapi"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -55,7 +56,7 @@ func routerGet() {
 					fmt.Println("B", i, "=", v)
 				}
 			}
-			c.JSON(200, cgminer.NoError)
+			c.JSON(200, errs.NoError)
 		})
 	}
 

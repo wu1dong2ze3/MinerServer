@@ -35,12 +35,12 @@ func (SystemNetUpdate) GetSubPath() string {
 func (SystemNetUpdate) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		log.Println("SystemNetUpdatePost a")
-		post := SystemNetUpdatePost{}
+		post := &SystemNetUpdatePost{}
 		var rType int
 		var ip, subnetMask, gateway, dns1, dns2 string
 		var err error
 		var errCode *errs.CodeError
-		if err = c.ShouldBindJSON(&post); err != nil {
+		if err = c.ShouldBindJSON(post); err != nil {
 			rType = c.GetInt("routerType")
 			ip = c.GetString("ip")
 			subnetMask = c.GetString("subnetMask")
@@ -56,7 +56,7 @@ func (SystemNetUpdate) GetHandle() gin.HandlerFunc {
 			dns2 = c.GetString("dns2")
 		}
 		if errCode = changeNetStatus(rType, ip, subnetMask, gateway, dns1, dns2, func() {
-			c.JSON(http.StatusOK, SystemNetUpdate{*BaseError(NoError)})
+			c.JSON(http.StatusOK, SystemNetUpdate{*BaseError(errs.NoError)})
 
 		}); errCode != nil {
 			c.JSON(http.StatusOK, SystemNetUpdate{*BaseError(errCode)})

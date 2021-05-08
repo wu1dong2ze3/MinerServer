@@ -2,20 +2,12 @@ package httpapi
 
 import (
 	"example.com/m/v2/errs"
-	"net/http"
 )
 
-var NoError = errs.Definition(http.StatusOK, "")
-var StatusUnauthorized = errs.Definition(http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-var MinerRebootFailed = errs.Definition(427, "Miner reboot failed!")
-var PostJsonError = errs.Definition(502, "Request JSON error") //
-var NoUser = errs.Definition(503, "User is not logged in")     //
-var NoNetConfigFile = errs.Definition(504, "NoNetConfigFile")  //
-var FileUplaodFailed = errs.Definition(504, "FileUplaodFailed")
-
-var CreateWebSocketError = errs.Definition(505, "CreateWebSocketError") //
-var WebSocketError = errs.Definition(506, "error! this is a websocket url! ")
-var ParamError = errs.Definition(507, "param error! ")
-var CanNotLoadFile = errs.Definition(508, "CanNotLoadFile")         //
-var CgMinerDeviceError = errs.Definition(509, "CgMinerDeviceError") //
-var UnknowError = errs.Definition(999, "UnknowError")
+var MinerRebootFailed = errs.Definition(670, "Miner reboot failed!")
+var NoUser = errs.Definition(671, "User is not logged in") //
+var FileUplaodFailed = errs.Definition(672, "FileUplaodFailed")
+var CreateWebSocketError = errs.Definition(673, "CreateWebSocketError") //
+var WebSocketError = errs.Definition(674, "error! this is a websocket url! ")
+var ExeShellError = errs.Definition(675, "Error executing script")         //
+var CgMinerDeviceError = errs.Definition(676, "CGMiner devices exception") //

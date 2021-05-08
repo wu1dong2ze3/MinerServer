@@ -15,6 +15,10 @@ type Result struct {
 	H Head
 	R []Body
 }
+type ResultD struct {
+	STATUS string
+	id     int
+}
 
 //{"STATUS":"S","When":1618385384,"Code":22,"Msg":"CGMiner versions","Description":"cgminer 2.8.7"}
 type Head struct {
@@ -48,17 +52,17 @@ func (r Result) BindBody(res interface{}) *errs.CodeError {
 	return nil
 }
 
-func Parse(jsonstr string) (*Result, error) {
+func Parse(jsonstr string) (*Result, *errs.CodeError) {
 	var f interface{}
 	js := filter0(jsonstr)
 	if !json.Valid(*js) {
 		fmt.Println("Parse error:json is wrong")
-		return nil, JsonError
+		return nil, errs.JsonError
 	}
 	err := json.Unmarshal(*js, &f)
 	if err != nil {
 		fmt.Println("Parse error:", err, " json is=", jsonstr)
-		return nil, JsonError
+		return nil, errs.JsonError
 	}
 	var head *Head
 	var error bool
@@ -92,9 +96,24 @@ func Parse(jsonstr string) (*Result, error) {
 	}
 	if bodys == nil || len(*bodys) == 0 {
 		fmt.Println("body==nil json is:", jsonstr)
-		return nil, DataErrorNoBody
+		return &Result{H: *head}, DataErrorNoBody
 	}
 	return &Result{*head, *bodys}, nil
+}
+
+func ParseD(jsonstr string) (*ResultD, *errs.CodeError) {
+	resD := &ResultD{}
+	js := filter0(jsonstr)
+	if !json.Valid(*js) {
+		fmt.Println("Parse error:json is wrong")
+		return nil, errs.JsonError
+	}
+	err := json.Unmarshal(*js, resD)
+	if err != nil {
+		fmt.Println("Parse error:", err, " json is=", jsonstr)
+		return nil, errs.JsonError
+	}
+	return resD, nil
 }
 
 func BodyMap() map[string]interface{} {
@@ -115,6 +134,7 @@ func init() {
 	resultMap["asc"] = body.Asc{}
 	resultMap["addpool"] = body.AddPool{}
 	resultMap["removepool"] = body.RemovePool{}
+	resultMap["restart"] = body.Restart{}
 }
 
 func filter0(in string) *[]byte {

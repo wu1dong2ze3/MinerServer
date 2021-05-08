@@ -24,25 +24,52 @@ func GetInstance() *NM {
 	return nm
 }
 
+/**
+Run has result
+*/
 func R(cmd string, param string) (*Result, *errs.CodeError) {
 	var err error
+	var errCode *errs.CodeError
 	var cmdByte []byte
 	var resultJson string
 	var result *Result
 	nm := GetInstance()
 	if cmdByte, err = json.Marshal(Create( /*body.Pools{}.ApiCmd()*/ cmd, param)); err != nil {
-		return nil, JsonParseError.Add(err).AddByString("json.Marshal error! ")
+		return nil, errs.JsonError.Add(err).AddByString("json.Marshal error! ")
 	}
 	if resultJson, err = nm.TcpCommandSyncByByte(cmdByte); err != nil {
-		return nil, JsonParseError.Add(err).AddByString("TcpCommandSyncByByte error! ")
+		return nil, errs.JsonError.Add(err).AddByString("TcpCommandSyncByByte error! ")
 	}
-	if result, err = Parse(resultJson); err != nil {
-		return nil, CGMinerError.Add(err).AddByString("Parse error! ")
+	if result, errCode = Parse(resultJson); errCode != nil {
+		return nil, CGMinerError.Add(errCode).AddByString("Parse error! ")
 	}
 	// 测试打印用
 	//for i, v := range result.R {
 	//	fmt.Println("B", i, "=", v)
 	//}
+	return result, nil
+}
+
+/**
+Run directly 这种方法允许忽略body内容
+*/
+func RD(cmd string, param string) (*ResultD, *errs.CodeError) {
+	var err error
+	var errCode *errs.CodeError
+	var cmdByte []byte
+	var resultJson string
+	var result *ResultD
+	nm := GetInstance()
+	if cmdByte, err = json.Marshal(Create( /*body.Pools{}.ApiCmd()*/ cmd, param)); err != nil {
+		return nil, errs.JsonError.Add(err).AddByString("json.Marshal error! ")
+	}
+	if resultJson, err = nm.TcpCommandSyncByByte(cmdByte); err != nil {
+		return nil, errs.JsonError.Add(err).AddByString("TcpCommandSyncByByte error! ")
+	}
+	if result, errCode = ParseD(resultJson); errCode != nil {
+
+		return nil, CGMinerError.Add(errCode).AddByString("Parse error! ")
+	}
 	return result, nil
 }
 
@@ -106,7 +133,7 @@ func (nm *NM) Addr(hostAddr string) *NM {
 }
 
 func checkError(err error) error {
-	errorCode := NoError
+	errorCode := errs.NoError
 	if err == nil {
 		return err
 	}

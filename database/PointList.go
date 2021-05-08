@@ -3,7 +3,6 @@ package database
 import (
 	"example.com/m/v2/errs"
 	"fmt"
-	"log"
 	"sync"
 )
 
@@ -39,7 +38,6 @@ func (obj PointList) getTableStruct() interface{} {
 var lock = sync.Mutex{}
 
 func SavePoints(time int, points *[]float64) *errs.CodeError {
-	log.Println("SavePoints:", time, *points)
 	lock.Lock()
 	defer lock.Unlock()
 	if points == nil || len(*points) < 1 || len(*points) > PointsCapacity {

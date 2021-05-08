@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"example.com/m/v2/errs"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -29,15 +30,15 @@ func (MinerFanInfo) GetSubPath() string {
 	return "/miner/fan/info"
 }
 
-//TODO 假数据
+//TODO 第一版本暂不处理
 func (MinerFanInfo) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, MinerFanInfo{*BaseError(NoError), MinerFanInfoResult{
+		c.JSON(http.StatusOK, MinerFanInfo{*BaseError(errs.NoError), MinerFanInfoResult{
 			[]FanInfoSubResult{
-				{0, 0, 7223},
-				{1, 0, 6233},
-				{2, 1, 0},
-				{3, 0, 5333},
+				{0, 0, 0},
+				{1, 0, 0},
+				{2, 0, 0},
+				{3, 0, 0},
 			}},
 		})
 	}

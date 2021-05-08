@@ -71,7 +71,7 @@ func (SystemOtaUpgrade) GetHandle() gin.HandlerFunc {
 		//TODO 测试关闭选项
 		//shell.STOP_CGMINER.Exec()
 		//提前返回
-		c.JSON(http.StatusOK, SystemOtaUpgrade{*BaseError(NoError)})
+		c.JSON(http.StatusOK, SystemOtaUpgrade{*BaseError(errs.NoError)})
 		//shell.RECOVERY.Params(OTA_PATH+UPDATE_FILE_NAME).Exec()
 	}
 }

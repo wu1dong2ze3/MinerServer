@@ -20,9 +20,10 @@ type SystemUiTitleBarResult struct {
 }
 
 type UiTitleBarResult struct {
-	Ip      string `json:"ip"`
-	Mac     string `json:"mac"`
-	Version string `json:"version"`
+	MinerName string `json:"minerName"`
+	Ip        string `json:"ip"`
+	Mac       string `json:"mac"`
+	Version   string `json:"version"`
 }
 
 func (SystemUiTitleBar) GetType() int {
@@ -37,7 +38,7 @@ func (SystemUiTitleBar) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ini, err := utils.Open("/etc/os-release")
 		if err != nil {
-			c.JSON(http.StatusOK, *BaseError(CanNotLoadFile))
+			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
 		version := utils.S{S: ini.Load("PRETTY_NAME", "")}.NoQuot().S
@@ -59,7 +60,7 @@ func (SystemUiTitleBar) GetHandle() gin.HandlerFunc {
 		})
 		c.JSON(http.StatusOK, SystemUiTitleBar{BaseJson{http.StatusOK, ""},
 			SystemUiTitleBarResult{
-				UiTitleBarResult{ip, mac, version}}})
+				UiTitleBarResult{"PoolinMiner1", ip, mac, version}}})
 	}
 }
 

@@ -49,7 +49,7 @@ func UpdateUser(pwd string, old string) (*User, error) {
 func Verify(name string, pwd string) error {
 	if err := GetInstance().DB().Find(&User{}, "Name = ? and Pwd = ? ", name, pwd).Error; err != nil {
 		log.Println("Verify:", name, pwd)
-		return UserPwdInvalid
+		return UserPwdError
 	}
 	return nil
 }

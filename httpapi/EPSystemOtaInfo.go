@@ -35,7 +35,7 @@ func (SystemOteInfo) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.JSON(http.StatusOK, SystemOteInfo{BaseJson{http.StatusOK, ""},
 			SystemOteInfoResult{
-				OteInfoResult{"ota-aa-bb-cc-1", "2021.4.5 22:22", "/user/file/ota_01_01.rar"}}})
+				OteInfoResult{"测试数据ota-aa-bb-cc-1", "测试数据2021.4.5 22:22", "测试数据/user/file/ota_01_01.rar"}}})
 	}
 }
 

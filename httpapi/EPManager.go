@@ -26,7 +26,7 @@ func (epm EPM) Execute(eg *gin.Engine) error {
 	for _, v := range epArray {
 		epm.execute(eg, v)
 	}
-	return eg.Run(":9090")
+	return eg.Run(":8080")
 }
 func (epm EPM) Test(eg *gin.Engine) (*gin.Engine, error) {
 	log.Println("EPM Test")
@@ -69,6 +69,7 @@ func userAuthorization() gin.HandlerFunc {
 			break
 		case "GET":
 		case "POST":
+			//TODO 正式版本 需要用户权限校验
 			//var v = &UserLogin{}
 			//if c.Request.URL.Path == v.GetSubPath() {
 			//} else {

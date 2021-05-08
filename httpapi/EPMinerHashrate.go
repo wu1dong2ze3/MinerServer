@@ -30,10 +30,13 @@ type HashrateSubResult struct {
 	Points    []Points `json:"points"`
 }
 type Points struct {
-	Index  int       `json:"index"`
-	Count  int       `json:"count"`
-	Points []float64 `json:"points"`
-	Times  []int     `json:"times"`
+	Index  int     `json:"index"`
+	Count  int     `json:"count"`
+	Points []Point `json:"points"`
+}
+type Point struct {
+	X int     `json:"x"`
+	Y float64 `json:"y"`
 }
 
 func (MinerHashrate) GetType() int {
@@ -49,7 +52,7 @@ func (MinerHashrate) GetHandle() gin.HandlerFunc {
 		poster := &MinerHashratePost{}
 		var err error
 		var codeErr *errs.CodeError
-		if err = c.ShouldBindJSON(poster); err != nil {
+		if err = c.ShouldBindJSON(&poster); err != nil {
 			//保留 type=0
 			poster.SinceTime = c.GetInt("sinceTime")
 			poster.UntilTime = c.GetInt("untilTime")
@@ -84,7 +87,7 @@ func (MinerHashrate) GetHandle() gin.HandlerFunc {
 			c.JSON(http.StatusOK, *BaseError(CgMinerDeviceError.AddByString("MinerHashrate:len(*pointList)<count or count > database.PointsCapacity")))
 			return
 		}
-		mhr := MinerHashrate{*BaseError(NoError), MinerHashrateResult{HashrateSubResult{}}}
+		mhr := MinerHashrate{*BaseError(errs.NoError), MinerHashrateResult{HashrateSubResult{}}}
 		mhr.Data.Hashrate.Points = make([]Points, deviceCount+1)
 		mhr.Data.Hashrate.SinceTime, mhr.Data.Hashrate.UntilTime = getTime(pointList)
 		mhr.Data.Hashrate.ResCount = deviceCount + 1 //需要加上总结果数量
@@ -108,11 +111,10 @@ func getTime(dbList *[]database.PointList) (sinceTime int, untilTime int) {
 func getPoints(index int, ptrPoints *Points, dbList *[]database.PointList) {
 	ptrPoints.Index = index
 	ptrPoints.Count = len(*dbList)
-	ptrPoints.Points = make([]float64, ptrPoints.Count)
-	ptrPoints.Times = make([]int, ptrPoints.Count)
+	ptrPoints.Points = make([]Point, ptrPoints.Count)
 	for i, v := range *dbList {
-		ptrPoints.Points[i] = reflectFloat64(index+1, v)
-		ptrPoints.Times[i] = v.Time
+		ptrPoints.Points[i].Y = reflectFloat64(index+1, v)
+		ptrPoints.Points[i].X = v.Time
 	}
 }
 func reflectFloat64(index int, point database.PointList) float64 {
@@ -122,77 +124,90 @@ func reflectFloat64(index int, point database.PointList) float64 {
 func getTotal(ptrPoints *Points, dbList *[]database.PointList) {
 	ptrPoints.Index = -1
 	ptrPoints.Count = len(*dbList)
-	ptrPoints.Points = make([]float64, ptrPoints.Count)
-	ptrPoints.Times = make([]int, ptrPoints.Count)
+	ptrPoints.Points = make([]Point, ptrPoints.Count)
 	for i, v := range *dbList {
-		ptrPoints.Points[i] = v.PointTotal
-		ptrPoints.Times[i] = v.Time
+		ptrPoints.Points[i].Y = v.PointTotal
+		ptrPoints.Points[i].X = v.Time
 	}
 }
 
 /**
 {
-  "code": 200,
-  "message": "成功",
-  "data": {
-    "hashrate": {
-      "start_collection_time": 123123432,
-      "end_collection_time": 126178431,
-      "type": 0,
-      "count": 5,
-      "points": [
-        {
-          "index:": 0,
-          "points": [
-            12.00,
-            13.00,
-            0,
-            0,
-            1.0
-          ]
-        },
-        {
-          "index:": 1,
-          "points": [
-            12.00,
-            13.00,
-            0,
-            0,
-            1.0
-          ]
-        },
-        {
-          "index:": 2,
-          "points": [
-            12.00,
-            13.00,
-            0,
-            0,
-            1.0
-          ]
-        },
-        {
-          "index:": 3,
-          "points": [
-            12.00,
-            13.00,
-            0,
-            0,
-            1.0
-          ]
-        },
-        {
-          "index:": -1,
-          "points": [
-            12.00,
-            13.00,
-            0,
-            0,
-            1.0
-          ]
-        }
-      ]
-    }
-  }
+	"code": 200,
+	"message": "",
+	"data": {
+		"hashrate": {
+			"sinceTime": 1620466053,
+			"untilTime": 1620466063,
+			"type": 0,
+			"resCount": 5,
+			"points": [{
+				"index": 0,
+				"count": 3,
+				"points": [{
+					"x": 1620466053,
+					"y": 42850.28
+				}, {
+					"x": 1620466058,
+					"y": 42850.34
+				}, {
+					"x": 1620466063,
+					"y": 42850.38
+				}]
+			}, {
+				"index": 1,
+				"count": 3,
+				"points": [{
+					"x": 1620466053,
+					"y": 42850.26
+				}, {
+					"x": 1620466058,
+					"y": 42850.31
+				}, {
+					"x": 1620466063,
+					"y": 42850.36
+				}]
+			}, {
+				"index": 2,
+				"count": 3,
+				"points": [{
+					"x": 1620466053,
+					"y": 42850.26
+				}, {
+					"x": 1620466058,
+					"y": 42850.32
+				}, {
+					"x": 1620466063,
+					"y": 42850.37
+				}]
+			}, {
+				"index": 3,
+				"count": 3,
+				"points": [{
+					"x": 1620466053,
+					"y": 42850.26
+				}, {
+					"x": 1620466058,
+					"y": 42850.31
+				}, {
+					"x": 1620466063,
+					"y": 42850.36
+				}]
+			}, {
+				"index": -1,
+				"count": 3,
+				"points": [{
+					"x": 1620466053,
+					"y": 171401.06000000003
+				}, {
+					"x": 1620466058,
+					"y": 171401.28
+				}, {
+					"x": 1620466063,
+					"y": 171401.46999999997
+				}]
+			}]
+		}
+	}
 }
 */

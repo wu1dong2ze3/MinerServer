@@ -10,7 +10,11 @@ type CodeError struct {
 var errs map[int]*CodeError = make(map[int]*CodeError)
 
 func (c CodeError) Error() string {
-	return fmt.Sprintf(" %s -- ErrorCode=%d", c.error, c.code)
+	if c.code != 200 && c.code != 0 {
+		return fmt.Sprintf(" %s [-- ErrorCode=%d --]", c.error, c.code)
+	} else {
+		return ""
+	}
 }
 
 func (c CodeError) Append(e error) error {

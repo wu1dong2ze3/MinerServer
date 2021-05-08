@@ -2,6 +2,8 @@ package httpapi
 
 import (
 	"example.com/m/v2/database"
+	"example.com/m/v2/errs"
+	"example.com/m/v2/shell"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -26,9 +28,11 @@ func (SystemReset) GetHandle() gin.HandlerFunc {
 		database.GetInstance().Delete()
 		//网络修改成dhcp
 		if err := changeNetStatus(1, "", "", "", "", "", func() {
-			c.JSON(http.StatusOK, SystemReset{*BaseError(NoError)})
+			c.JSON(http.StatusOK, SystemReset{*BaseError(errs.NoError)})
 		}); err != nil {
 			c.JSON(http.StatusOK, SystemReset{*BaseError(err)})
 		}
+		shell.STOP_CGMINER.Exec()
+		shell.STOP_CGMINER.Exec()
 	}
 }
