@@ -9,4 +9,5 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/stretchr/testify v1.4.0
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )

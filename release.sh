@@ -7,8 +7,10 @@ echo 'build over,begin copy'
 docker exec $DOCKER_USER  ssh $ROOT_HOST killall MinerServer-linux-arm64
 docker exec $DOCKER_USER  ssh $ROOT_HOST killall MinerServer-release
 echo 'kill server'
+docker exec $DOCKER_USER  ssh $ROOT_HOST 'mkdir /userdata/MinerRelease'
 docker exec $DOCKER_USER  scp build/MinerServer-linux-arm64 $ROOT_HOST:/userdata/MinerRelease
 echo 'copy end'
 docker exec $DOCKER_USER  ssh $ROOT_HOST 'chmod 777 /userdata/MinerRelease/MinerServer-linux-arm64'
 docker exec $DOCKER_USER  ssh $ROOT_HOST 'mv /userdata/MinerRelease/MinerServer-linux-arm64 /userdata/MinerRelease/MinerServer-release'
-ssh $ROOT_HOST nohup /userdata/MinerRelease/MinerServer-release
+scp -r ./static $ROOT_HOST:/userdata/MinerRelease/
+ssh $ROOT_HOST nohup /userdata/MinerRelease/MinerServer-release &

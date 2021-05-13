@@ -2,6 +2,7 @@ package cgminer
 
 import (
 	"encoding/json"
+	"errors"
 	"example.com/m/v2/errs"
 	"io/ioutil"
 	"log"
@@ -35,12 +36,15 @@ func R(cmd string, param string) (*Result, *errs.CodeError) {
 	var result *Result
 	nm := GetInstance()
 	if cmdByte, err = json.Marshal(Create( /*body.Pools{}.ApiCmd()*/ cmd, param)); err != nil {
+		log.Println("Marshal err")
 		return nil, errs.JsonError.Add(err).AddByString("json.Marshal error! ")
 	}
 	if resultJson, err = nm.TcpCommandSyncByByte(cmdByte); err != nil {
+		log.Println("TcpCommandSyncByByte err")
 		return nil, errs.JsonError.Add(err).AddByString("TcpCommandSyncByByte error! ")
 	}
 	if result, errCode = Parse(resultJson); errCode != nil {
+		log.Println("Parse err")
 		return nil, CGMinerError.Add(errCode).AddByString("Parse error! ")
 	}
 	// 测试打印用
@@ -86,22 +90,20 @@ func (nm *NM) tcpCommandByByte(data []byte, res chan string, cerr chan error) {
 	defer mutex.Unlock()
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp", nm.addr)
-	if err = checkError(err); err != nil {
-		err = NoAddrSetError
+	if err != nil {
 		return
 	}
 	//建立tcp连接
 	conn, err := net.DialTCP("tcp", nil, tcpAddr)
-	if err = checkError(err); err != nil {
+	if err != nil {
 		return
 	}
 
 	//向服务端发送数据
 	_, err = conn.Write(data)
-	if err = checkError(err); err != nil {
+	if err != nil {
 		return
 	}
-
 	//接收响应
 	response, _ := ioutil.ReadAll(conn)
 	resRtr := string(response)
@@ -113,7 +115,7 @@ func (nm *NM) TcpCommandSync(cmd string) (string, error) {
 }
 func (nm *NM) TcpCommandSyncByByte(b []byte) (string, error) {
 	if nm.addr == "" {
-		return "", NoAddrSetError
+		return "", errors.New("no addr")
 	}
 	result := make(chan string)
 	errorCode := make(chan error)
@@ -130,17 +132,4 @@ func (nm *NM) TcpCommand(cmd string, res chan string, cerr chan error) {
 func (nm *NM) Addr(hostAddr string) *NM {
 	nm.addr = hostAddr
 	return nm
-}
-
-func checkError(err error) error {
-	errorCode := errs.NoError
-	if err == nil {
-		return err
-	}
-	switch err {
-	default:
-		errorCode = NetError.Add(err)
-	}
-	log.Println("checkError;", err)
-	return errorCode
 }

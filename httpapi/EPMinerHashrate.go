@@ -4,8 +4,10 @@ import (
 	"example.com/m/v2/cgminer"
 	"example.com/m/v2/database"
 	"example.com/m/v2/errs"
+	"example.com/m/v2/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"reflect"
 )
@@ -35,8 +37,8 @@ type Points struct {
 	Points []Point `json:"points"`
 }
 type Point struct {
-	X int     `json:"x"`
-	Y float64 `json:"y"`
+	Name  float64   `json:"name"`
+	Value []float64 `json:"value"`
 }
 
 func (MinerHashrate) GetType() int {
@@ -113,8 +115,10 @@ func getPoints(index int, ptrPoints *Points, dbList *[]database.PointList) {
 	ptrPoints.Count = len(*dbList)
 	ptrPoints.Points = make([]Point, ptrPoints.Count)
 	for i, v := range *dbList {
-		ptrPoints.Points[i].Y = reflectFloat64(index+1, v)
-		ptrPoints.Points[i].X = v.Time
+		ptrPoints.Points[i].Value = make([]float64, 2)
+		ptrPoints.Points[i].Name = float64(v.Time * 1000)
+		ptrPoints.Points[i].Value[1] = utils.Decimal5(reflectFloat64(index+1, v) / 1000)
+		ptrPoints.Points[i].Value[0] = float64(v.Time * 1000)
 	}
 }
 func reflectFloat64(index int, point database.PointList) float64 {
@@ -125,9 +129,12 @@ func getTotal(ptrPoints *Points, dbList *[]database.PointList) {
 	ptrPoints.Index = -1
 	ptrPoints.Count = len(*dbList)
 	ptrPoints.Points = make([]Point, ptrPoints.Count)
+	log.Println("getTotal:Count=", ptrPoints.Count)
 	for i, v := range *dbList {
-		ptrPoints.Points[i].Y = v.PointTotal
-		ptrPoints.Points[i].X = v.Time
+		ptrPoints.Points[i].Value = make([]float64, 2)
+		ptrPoints.Points[i].Name = float64(v.Time * 1000)
+		ptrPoints.Points[i].Value[1] = utils.Decimal5(v.PointTotal / 1000)
+		ptrPoints.Points[i].Value[0] = float64(v.Time * 1000)
 	}
 }
 

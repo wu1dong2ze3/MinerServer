@@ -19,3 +19,15 @@ func IsExist(path string) bool {
 	}
 	return true
 }
+
+func MakeSurePath(path string) error {
+	_, err := os.Stat(path)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	err = os.Mkdir(path, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
+}

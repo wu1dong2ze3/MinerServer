@@ -9,7 +9,6 @@ import (
 	"os"
 	"reflect"
 	"sync"
-	"syscall"
 )
 
 const dbname string = "miner.db"
@@ -34,9 +33,10 @@ func (dbm DBM) DB() *gorm.DB {
 		path := getDBFilePath()
 		log.Println("DB path=", path)
 		bFirst := false
-		dbfile, ferr := os.OpenFile(dbname, syscall.O_RDWR, 0755)
+		dbfile, ferr := os.OpenFile(path, os.O_RDONLY, 0755)
 		if ferr != nil {
 			bFirst = true
+			log.Println("DB open path is ", ferr)
 		} else {
 			bFirst = false
 			err = dbfile.Close()
@@ -80,6 +80,7 @@ func (dbm DBM) Close() {
 }
 
 func firstStart(db *gorm.DB) error {
+	log.Println("DB firstStart")
 	allModels := []Table{&User{}, &TestData{}, &PointList{}}
 	var err error = nil
 	for _, v := range allModels {

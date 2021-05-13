@@ -10,7 +10,8 @@ import (
 	"time"
 )
 
-const DEADLINE = 24 //24小时
+const DEADLINE = 12 //24小时
+const TICKTIME = 15 //15秒采集一次
 type MT struct {
 	running chan bool
 	cache   *RCache
@@ -34,7 +35,7 @@ func (mt *MT) StartLoadMiner() {
 	if mt.running != nil {
 		return
 	}
-	mt.ticker = time.NewTicker(5 * time.Second)
+	mt.ticker = time.NewTicker(TICKTIME * time.Second)
 	mt.running = make(chan bool)
 	mt.cache = NewRCache()
 	log.Println("StartLoadMiner...")
@@ -43,7 +44,7 @@ func (mt *MT) StartLoadMiner() {
 		for {
 			select {
 			case <-ticker.C:
-				log.Println("Ticker do")
+				//log.Println("Ticker do")
 				mt.doTick()
 			case stop := <-mt.running:
 				if stop {
@@ -85,7 +86,7 @@ func (mt *MT) doTick() {
 	for i, v := range *resList {
 		points[i] = v.Mhs15M
 	}
-	log.Println("online Decice ASCCount:", config.ASCCount)
+	//log.Println("online Decice ASCCount:", config.ASCCount)
 	//保存数据库结果用于绘图
 	if errcode = database.SavePoints(when, &points); errcode != nil {
 		log.Println("SavePoints error!" + errcode.Error())

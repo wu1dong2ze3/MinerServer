@@ -3,12 +3,17 @@ package shell
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"fmt"
 	"io"
+	"log"
 	"os/exec"
+	"strings"
 )
 
 type CallBack func(out string, err error) (needContinue bool)
+
+type AsynCallBack func(out string, err error, cancel context.CancelFunc) (needContinue bool)
 
 type Cmd struct {
 	cmd string
@@ -58,38 +63,52 @@ func (c Cmd) ExecCallBack(callBack CallBack) {
 }
 
 func (c Cmd) Params(params ...string) *Cmd {
-	for _, v := range params {
+	for i, v := range params {
+		if strings.Contains(c.cmd, "$$") {
+			paramStr := fmt.Sprintf("$$%d", i+1)
+			c.cmd = strings.ReplaceAll(c.cmd, paramStr, v)
+			continue
+		}
 		c.cmd = c.cmd + " " + v
 	}
+	log.Println("Params:", c.cmd)
 	return &c
 }
 
-//阻塞式通过回调处理返回
-func (c Cmd) ExecCallBackNoEOF(callBack CallBack) {
-	cmd := exec.Command("/bin/bash", "-c", c.cmd)
+//非阻断式执行
+func (c Cmd) AsynExecCallBack(callBack AsynCallBack) context.CancelFunc {
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Duration(5)*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
+	go c.doCommand(callBack, cancel, ctx)
+	return cancel
+}
+
+func (c Cmd) doCommand(callBack AsynCallBack, cancel context.CancelFunc, ctx context.Context) {
+	cmd := exec.CommandContext(ctx, "/bin/bash", "-c", c.cmd)
 	fmt.Println(cmd.Args)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		callBack("", err)
+		callBack("", err, nil)
 		return
 	}
 	if err = cmd.Start(); err != nil {
-		callBack("", err)
+		callBack("", err, nil)
 		return
 	}
 	reader := bufio.NewReader(stdout)
 	for {
 		line, err2 := reader.ReadString('\n')
-		if !callBack(line, err2) {
+		if !callBack(line, err2, cancel) {
 			break
 		}
 		//除非主动退出，否则一直阻断
-		//if io.EOF == err2 {
-		//	break
-		//}
+		if err2 != nil {
+			fmt.Println("doCommand error out:", err2)
+			break
+		}
 	}
 	if err = cmd.Wait(); err != nil {
-		callBack("", err)
+		callBack("", err, nil)
 		return
 	}
 	fmt.Println("execCommand", "end")

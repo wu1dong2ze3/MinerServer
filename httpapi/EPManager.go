@@ -19,9 +19,18 @@ func InstanceEPM() *EPM {
 	})
 	return instanceEPM
 }
+func (epm EPM) BindEp(eg *gin.Engine) {
+	log.Println("Execute")
+	eg.MaxMultipartMemory = 1024 * 1024 * 8 //8m
+	eg.Use(userAuthorization())
+	for _, v := range epArray {
+		epm.execute(eg, v)
+	}
+}
 
 func (epm EPM) Execute(eg *gin.Engine) error {
 	log.Println("Execute")
+	eg.MaxMultipartMemory = 1024 * 1024 * 8 //8m
 	eg.Use(userAuthorization())
 	for _, v := range epArray {
 		epm.execute(eg, v)

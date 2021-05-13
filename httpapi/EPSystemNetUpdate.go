@@ -49,11 +49,11 @@ func (SystemNetUpdate) GetHandle() gin.HandlerFunc {
 			dns2 = c.GetString("dns2")
 		} else {
 			rType = post.RouterType
-			ip = c.GetString("ip")
-			subnetMask = c.GetString("subnetMask")
-			gateway = c.GetString("gateway")
-			dns1 = c.GetString("dns1")
-			dns2 = c.GetString("dns2")
+			ip = post.Ip
+			subnetMask = post.SubnetMask
+			gateway = post.Gateway
+			dns1 = post.Dns1
+			dns2 = post.Dns2
 		}
 		if errCode = changeNetStatus(rType, ip, subnetMask, gateway, dns1, dns2, func() {
 			c.JSON(http.StatusOK, SystemNetUpdate{*BaseError(errs.NoError)})
@@ -141,9 +141,13 @@ func changeNetStatus(rType int, ip, subnetMask, gateway, dns1, dns2 string, fBef
 		if err != nil {
 			return utils.ParamError
 		}
+		if err = ini.Save(); err != nil {
+			return errs.IoError.AddByString("save /config/network/25-wired.network error!")
+		}
 		if fBeforeClose != nil {
 			fBeforeClose()
 		}
+
 		_, err = shell.NetworkRestart.Exec()
 		if err != nil {
 			return utils.ParamError

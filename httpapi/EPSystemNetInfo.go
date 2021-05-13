@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"example.com/m/v2/errs"
 	"example.com/m/v2/shell"
 	"example.com/m/v2/utils"
 	"github.com/gin-gonic/gin"
@@ -42,6 +43,17 @@ func (SystemNetInfo) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		res := NetInfoResult{}
 		bdns := false
+
+		if ini, error := utils.Open("/config/network/25-wired.network"); error != nil {
+			c.JSON(http.StatusOK, *BaseError(errs.IoError.AddByString("/config/network/25-wired.network can't load!")))
+			return
+		} else {
+			if ini.Load("DHCP", "") == "" {
+				res.RouterType = 0
+			} else {
+				res.RouterType = 1
+			}
+		}
 		shell.NetworkStatus.ExecCallBack(func(out string, err error) (needContinue bool) {
 			if strings.Contains(out, "HW Address: ") {
 				arr := strings.Split(out, ": ")
@@ -49,13 +61,8 @@ func (SystemNetInfo) GetHandle() gin.HandlerFunc {
 				res.Mac = utils.S{S: arr[1]}.NoSpaceBr().S
 				return true
 			}
-			//TODO 判断 router类型
-			if strings.Contains(out, "State: ") {
-				arr := strings.Split(out, ": ")
-				log.Println("State:", arr)
-				res.RouterType = 0
-				return true
-			}
+			//TODO 判断 router类型 dhcp="State: routable (configured)"
+
 			if !strings.Contains(out, "HW Address: ") && strings.Contains(out, "Address: ") {
 				arr := strings.Split(out, ": ")
 				log.Println("Address:", arr)

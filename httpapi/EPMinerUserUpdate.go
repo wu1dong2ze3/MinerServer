@@ -4,6 +4,7 @@ import (
 	"example.com/m/v2/cgminer"
 	"example.com/m/v2/cgminer/body"
 	"example.com/m/v2/errs"
+	"example.com/m/v2/shell"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -57,31 +58,27 @@ func (MinerUserUpdate) GetHandle() gin.HandlerFunc {
 			return
 		}
 
-		if result, errCode := cgminer.RD("restart", ""); errCode != nil {
+		if _, err = shell.RESTART_CGMINER.Exec(); err != nil {
 			c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(CgMinerDeviceError.Add(errCode))})
 			return
 		} else {
-			if result.STATUS == "RESTART" {
-				testOk := false
-				for i := 0; i < 10; i++ {
-					if _, errCode = cgminer.R(body.Version{}.ApiCmd(), ""); errCode != nil {
-						time.Sleep(time.Duration(2) * time.Second)
-						log.Printf("try to restart! %d times", i+1)
-						continue
-					}
-					testOk = true
-					break
+			testOk := false
+			for i := 0; i < 10; i++ {
+				if _, errCode = cgminer.R(body.Version{}.ApiCmd(), ""); errCode != nil {
+					time.Sleep(time.Duration(2) * time.Second)
+					log.Printf("try to restart! %d times,error is %s", i+1, errCode.Error())
+					continue
 				}
-				if testOk {
-					c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(errs.NoError)})
-				} else {
-					c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(CgMinerDeviceError.AddByString("cgminer restart over runtime!"))})
-				}
-				return
-			} else {
-				c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(CgMinerDeviceError.AddByString("restart failed"))})
-				return
+				testOk = true
+				break
 			}
+			if testOk {
+				c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(errs.NoError)})
+			} else {
+				c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(CgMinerDeviceError.AddByString("cgminer restart over runtime!"))})
+			}
+			return
+
 		}
 		//if _,err=shell.STOP_CGMINER.Exec();err!=nil{
 		//	c.JSON(http.StatusOK, MinerUserUpdate{*BaseError(CgMinerDeviceError.Add(err))})

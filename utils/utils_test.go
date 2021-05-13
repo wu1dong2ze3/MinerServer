@@ -49,3 +49,10 @@ func TestUserLogin(t *testing.T) {
 	log.Println("TestUserLogin open", ini.LoadByIndex("DNS", 0, "aa"))
 
 }
+
+func TestString(t *testing.T) {
+	a, b := CheckCidr("192.168.101.240", "255.255.254.0")
+
+	log.Println("wdz TestString", a, b)
+
+}
