@@ -36,12 +36,11 @@ func (SystemUiTitleBar) GetSubPath() string {
 
 func (SystemUiTitleBar) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ini, err := utils.Open("/etc/os-release")
-		if err != nil {
-			c.JSON(http.StatusOK, *BaseError(ExeShellError))
+		version, _, errCode := utils.GetVersionInfo()
+		if errCode != nil {
+			c.JSON(http.StatusOK, *BaseError(errCode))
 			return
 		}
-		version := utils.S{S: ini.Load("PRETTY_NAME", "")}.NoQuot().S
 		var ip, mac string
 		shell.NetworkStatus.ExecCallBack(func(out string, err error) (needContinue bool) {
 			if strings.Contains(out, "HW Address: ") {

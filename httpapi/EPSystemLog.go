@@ -55,7 +55,6 @@ func (SystemLog) GetHandle() gin.HandlerFunc {
 			log.Println("/system/log=ExecCallBackNoEOF", timeStr)
 
 			cancel := shell.Log.AsynExecCallBack(func(out string, err error, cancel context.CancelFunc) (needContinue bool) {
-				log.Println("AsynExecCallBack:", out)
 				bytes, _ := json.Marshal(&SystemSocketData{200, "", "normal", out})
 				if err = ws.WriteMessage(websocket.TextMessage, bytes); err != nil {
 					log.Println("/system/log=AsynExecCallBack error!Over!", err)

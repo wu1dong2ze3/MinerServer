@@ -45,11 +45,11 @@ func (SystemHardwareStatus) GetHandle() gin.HandlerFunc {
 			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
-		if memAble, err = shell.MemAvailable.Exec(); err != nil {
+		if memAble, err = shell.FreeUsedMem.Exec(); err != nil {
 			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
-		if memtotal, err = shell.MemTotal.Exec(); err != nil {
+		if memtotal, err = shell.FreeTotalMem.Exec(); err != nil {
 			c.JSON(http.StatusOK, *BaseError(ExeShellError))
 			return
 		}
@@ -62,8 +62,8 @@ func (SystemHardwareStatus) GetHandle() gin.HandlerFunc {
 			return
 		}
 		time = utils.S{S: time}.NoBr().S
-		memAble = utils.S{S: memAble}.NoSpace().NoBr().NoAny("MemAvailable:").S
-		memtotal = utils.S{S: memtotal}.NoSpace().NoBr().NoAny("MemTotal:").S
+		memAble = utils.S{S: memAble}.NoSpace().NoBr().S
+		memtotal = utils.S{S: memtotal}.NoSpace().NoBr().S
 		cpu = utils.S{S: cpu}.NoAny("%").NoAny(`/bin/bash`).NoBr().NoQuot().S
 		rom = utils.S{S: rom}.Replace(" ", "/").NoBr().Flip("/").S
 		log.Println("cpu", cpu)

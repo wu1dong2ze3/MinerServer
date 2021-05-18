@@ -1,0 +1,14 @@
+[Unit]
+Description=MinserServer
+After=network.target userdata.mount
+Requires=userdata.mount
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+PrivateTmp=no
+ExecStart=/userdata/MinerRelease/MinerServer-release
+Restart=on-failure
+RestartSec=10
+[Install]
+WantedBy=multi-user.target
