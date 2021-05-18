@@ -18,6 +18,7 @@ var STOP_CGMINER = New("systemctl stop cgminer.service")
 var RECOVERY = New("recoverySystem ota ")
 var RM = New("rm ")
 var STAT = New("stat ")
+var ARPING = New("arping")
 
 //tar -zcvf   file.tar.gz file 压缩
 var TAR = New("tar -xvf $$1 -C $$2")

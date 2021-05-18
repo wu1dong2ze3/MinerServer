@@ -11,3 +11,6 @@ var CreateWebSocketError = errs.Definition(673, "CreateWebSocketError") //
 var WebSocketError = errs.Definition(674, "error! this is a websocket url! ")
 var ExeShellError = errs.Definition(675, "Error executing script")         //
 var CgMinerDeviceError = errs.Definition(676, "CGMiner devices exception") //
+var UpdateFregError = errs.Definition(677, "CGMiner UpdateFregError")      //
+var UpdateVolError = errs.Definition(678, "CGMiner UpdateVolError")        //
+var IpConflict = errs.Definition(679, "Ip Conflict")                       //

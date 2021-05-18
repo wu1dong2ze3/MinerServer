@@ -1,12 +1,9 @@
 package cgminer
 
 import (
-	"encoding/json"
 	"example.com/m/v2/errs"
 	"example.com/m/v2/utils"
-	"io/ioutil"
 	"log"
-	"os"
 	"sync"
 )
 
@@ -64,7 +61,6 @@ func (pjm PJM) Save(psJson *PoolsJson) *errs.CodeError {
 	if len(psJson.Pools) <= 0 {
 		return errs.ParamsError.AddByString("psJson.Pools size at least one!")
 	}
-	var err error
 	var lastJson *PoolsJson
 	var errCode *errs.CodeError
 	if lastJson, errCode = pjm.Load(); errCode != nil {
@@ -82,45 +78,18 @@ func (pjm PJM) Save(psJson *PoolsJson) *errs.CodeError {
 		}
 	}
 	copy(lastJson.Pools, psJson.Pools)
-	var data []byte
-	if data, err = json.Marshal(lastJson); err != nil {
-		return errs.IoError.Add(err)
-	}
-	if f, err := os.OpenFile(JsonFile, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0775); err != nil {
-		return errs.IoError.Add(err).AddByString("Create file error！" + JsonFile)
-	} else {
-		defer f.Close()
-		if _, err = f.Write(data); err != nil {
-			return errs.IoError.Add(err).AddByString("f.Write(data)")
-		}
-	}
-	return nil
+	return utils.SaveJson(lastJson, JsonFile)
 }
 
 func (pjm PJM) Load() (*PoolsJson, *errs.CodeError) {
-	var err error
-	var data []byte
 	if !utils.IsExist(JsonFile) {
-		if data, err = json.Marshal(Default); err != nil {
-			return nil, errs.IoError.AddByString("json.Marshal error!").Add(err)
+		if errCode := utils.SaveJson(&Default, JsonFile); errCode != nil {
+			return nil, errCode
 		}
-		var f *os.File
-		if f, err = os.OpenFile(JsonFile, os.O_CREATE|os.O_RDWR, 0755); err != nil {
-			return nil, errs.IoError.AddByString("OpenFile error!file is " + JsonFile).Add(err)
-		}
-		if _, err = f.Write(data); err != nil {
-			return nil, errs.IoError.AddByString("Write error!").Add(err)
-		}
-		if err = f.Close(); err != nil {
-			return nil, errs.IoError.AddByString("f.Close()").Add(err)
-		}
-	}
-	if data, err = ioutil.ReadFile(JsonFile); err != nil {
-		return nil, errs.IoError.AddByString("ioutil.ReadFile:" + JsonFile).Add(err)
 	}
 	var pjs = PoolsJson{}
-	if err := json.Unmarshal(data, &pjs); err != nil {
-		return nil, errs.IoError.AddByString("Unmarshal:" + JsonFile).Add(err)
+	if errCode := utils.LoadJson(&pjs, JsonFile); errCode != nil {
+		return nil, errCode
 	}
 	return &pjs, nil
 }

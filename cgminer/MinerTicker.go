@@ -10,12 +10,14 @@ import (
 	"time"
 )
 
-const DEADLINE = 12 //24小时
-const TICKTIME = 15 //15秒采集一次
+const DEADLINE = 24 //24小时
+const TICKTIME = 5  //5秒采集一次
+const SAVERATE = 3  //保存频率 范围1-N 代表过一个采集间隔时间（RATE*TICKTIME）采集一次
 type MT struct {
-	running chan bool
-	cache   *RCache
-	ticker  *time.Ticker
+	running   chan bool
+	cache     *RCache
+	ticker    *time.Ticker
+	saveCount int
 }
 
 var mt *MT
@@ -87,15 +89,26 @@ func (mt *MT) doTick() {
 		points[i] = v.Mhs15M
 	}
 	//log.Println("online Decice ASCCount:", config.ASCCount)
-	//保存数据库结果用于绘图
-	if errcode = database.SavePoints(when, &points); errcode != nil {
-		log.Println("SavePoints error!" + errcode.Error())
-		return
-	}
-	//删除过期数据
-	if errcode = database.DelPoints((int)(time.Now().Add(-time.Duration(DEADLINE) * time.Hour).Unix())); errcode != nil {
-		log.Println("DelPoints error!" + errcode.Error())
-		return
+
+	if mt.saveCount == 0 {
+		//保存数据库结果用于绘图
+		//log.Println("database.SavePoints ", time.Now())
+		if errcode = database.SavePoints(when, &points); errcode != nil {
+			log.Println("SavePoints error!" + errcode.Error())
+			return
+		}
+		//删除过期数据
+		if errcode = database.DelPoints((int)(time.Now().Add(-time.Duration(DEADLINE) * time.Hour).Unix())); errcode != nil {
+			log.Println("DelPoints error!" + errcode.Error())
+			return
+		}
+		mt.saveCount++
+	} else {
+		if mt.saveCount+1 >= SAVERATE {
+			mt.saveCount = 0
+		} else {
+			mt.saveCount++
+		}
 	}
 
 	//测试1分钟过期数据
