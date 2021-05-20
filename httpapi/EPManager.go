@@ -65,19 +65,14 @@ func userAuthorization() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		c.Header("Access-Control-Allow-Headers", "Content-Type, AccessToken, X-CSRF-Token, Authorization, Token")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, AccessToken, X-CSRF-Token, Authorization, Token, Accept-Language, Content-Language ,language")
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
 		c.Header("Access-Control-Allow-Credentials", "true")
 		method := c.Request.Method
-		if method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-		}
 		switch method {
 		case "OPTIONS":
 			c.AbortWithStatus(http.StatusNoContent)
-			break
-		case "GET":
-		case "POST":
+		case "GET", "POST":
 			//TODO 正式版本 需要用户权限校验
 			//var v = &UserLogin{}
 			//if c.Request.URL.Path == v.GetSubPath() {
@@ -86,11 +81,10 @@ func userAuthorization() gin.HandlerFunc {
 			//	log.Println("userAuthorization:", c.Request.URL.Path)
 			//	if !InstanceTKM().Check(token) {
 			//		log.Println("userAuthorization failed:", c.Request.URL.Path, "token=", token)
-			//		c.JSON(http.StatusUnauthorized, BaseError(StatusUnauthorized))
+			//		c.JSON(http.StatusUnauthorized, *BaseError(ErrToken))
 			//		return
 			//	}
 			//}
-			break
 		}
 		log.Println("userAuthorization", c.FullPath())
 		c.Next()

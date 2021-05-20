@@ -52,18 +52,18 @@ func (v Asc) ApiCmd() string {
 	"ASC": [{
 		"ASC": 0,
 		"Name": "IT1",
-		"ID": 0,  // TODO 序号
+		"ID": 0,  //  序号
 		"Enabled": "Y",
-		"Status": "Alive", //TODO
-		"Temperature": 0.00,//TODO
+		"Status": "Alive", //
+		"Temperature": 0.00,//
 		"MHS av": 42855.49,
 		"MHS 5s": 42855.34,
 		"MHS 1m": 42855.32,
 		"MHS 5m": 42855.82,
-		"MHS 15m": 42856.04, //TODO 实时算力 3秒刷一次 g/h  t/t
-		"Accepted": 0, //TODO
-		"Rejected": 0, //TODO
-		"Hardware Errors": 0,  //TODO 硬件错误
+		"MHS 15m": 42856.04, // 实时算力 3秒刷一次 g/h  t/t
+		"Accepted": 0, //
+		"Rejected": 0, //
+		"Hardware Errors": 0,  // 硬件错误
 		"Utility": 0.00,
 		"Last Share Pool": -1,
 		"Last Share Time": 0,

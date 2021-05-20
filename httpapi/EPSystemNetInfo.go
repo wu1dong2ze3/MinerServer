@@ -61,7 +61,6 @@ func (SystemNetInfo) GetHandle() gin.HandlerFunc {
 				res.Mac = utils.S{S: arr[1]}.NoSpaceBr().S
 				return true
 			}
-			//TODO 判断 router类型 dhcp="State: routable (configured)"
 
 			if !strings.Contains(out, "HW Address: ") && strings.Contains(out, "Address: ") {
 				arr := strings.Split(out, ": ")

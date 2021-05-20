@@ -45,12 +45,12 @@ func (v Summary) ApiCmd() string {
 		"Description": "cgminer 4.10.0"
 	}],
 	"SUMMARY": [{
-		"Elapsed": 21761, //TODO 主面板 开机时间？
+		"Elapsed": 21761, // 主面板 开机时间？
 		"MHS av": 171417.93,
 		"MHS 5s": 169427.60,
 		"MHS 1m": 169147.79,
 		"MHS 5m": 168574.95,
-		"MHS 15m": 168175.38, //TODO 主面板 实时算力
+		"MHS 15m": 168175.38, // 主面板 实时算力
 		"Found Blocks": 0,
 		"Getworks": 962,
 		"Accepted": 3,
@@ -70,11 +70,11 @@ func (v Summary) ApiCmd() string {
 		"Difficulty Stale": 0.00000000,
 		"Best Share": 0,
 		"Device Hardware%": 0.0000,
-		"Device Rejected%": 0.0000, //TODO 主面板 拒绝率
+		"Device Rejected%": 0.0000, // 主面板 拒绝率
 		"Pool Rejected%": 72.7273,
 		"Pool Stale%": 0.0000,
-		"Last getwork": 1619619561//TODO 主面板 开机时间？
-      //TODO 矿机温度，取算力板平均温度
+		"Last getwork": 1619619561// 主面板 开机时间？
+      // 矿机温度，取算力板平均温度
 	}],
 	"id": 1
 }

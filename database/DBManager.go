@@ -55,7 +55,7 @@ func (dbm DBM) DB() *gorm.DB {
 				log.Fatalln(err, ":The first attempt to create the database failed! exist!")
 			}
 		}
-		//TODO test
+		// test
 		{
 			//instance.Close()
 			//os.Remove(dbname)

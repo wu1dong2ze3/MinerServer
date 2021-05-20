@@ -70,7 +70,7 @@ func (v Pools) ApiCmd() string {
 		"Difficulty Rejected": 65536.00000000,
 		"Difficulty Stale": 0.00000000,
 		"Last Share Difficulty": 0.00000000,
-		"Work Difficulty": 65536.00000000, //TODO 难度
+		"Work Difficulty": 65536.00000000, // 难度
 		"Has Stratum": true,
 		"Stratum Active": true,
 		"Stratum URL": "btc.ss.poolin.com",

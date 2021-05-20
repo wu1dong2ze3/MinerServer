@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"example.com/m/v2/utils/simpleticker"
+	"fmt"
 	"log"
 	"testing"
+	"time"
 )
 
 /** dhcp模式
@@ -54,5 +57,50 @@ func TestString(t *testing.T) {
 	a, b := CheckCidr("192.168.101.240", "255.255.254.0")
 
 	log.Println("wdz TestString", a, b)
+
+}
+
+func TestSimpleTicker(t *testing.T) {
+
+	ss := simpleticker.New()
+	ss.DoFunc(func(tickCount int64) {
+		fmt.Printf("tcount:%d\n", tickCount)
+		if tickCount == 2 {
+			ss.Stop()
+			ss.Stop()
+		}
+	}).Start()
+
+	time.Sleep(5 * time.Second)
+	fmt.Println("end test1")
+	ss.Stop()
+	fmt.Println("end test2")
+
+}
+func addNumberToChan(chanName chan int) {
+	for {
+		chanName <- 1
+		time.Sleep(1 * time.Second)
+	}
+}
+func TestSimpleTicker2(t *testing.T) {
+	var chan1 = make(chan int)
+	var chan2 = make(chan int)
+
+	go addNumberToChan(chan1)
+	time.Sleep(500 * time.Millisecond)
+	go addNumberToChan(chan2)
+
+	for {
+		select {
+		case e := <-chan1:
+			fmt.Printf("Get element from chan1: %d\n", e)
+		case e := <-chan2:
+			fmt.Printf("Get element from chan2: %d\n", e)
+			//default:
+			//	fmt.Printf("No element in chan1 and chan2.\n")
+			//time.Sleep(0.5 * time.Second)
+		}
+	}
 
 }

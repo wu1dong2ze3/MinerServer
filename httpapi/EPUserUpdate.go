@@ -40,11 +40,11 @@ func (UserUpdate) GetHandle() gin.HandlerFunc {
 		}
 		var user *database.User
 		if user, err = database.UpdateUser(poster.Pwd, poster.Old); err != nil {
-			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
+			c.JSON(http.StatusForbidden, *BaseError(database.UserPwdError))
 			return
 		}
 		if token, err = InstanceTKM().Save(user.Name, user.Pwd); err != nil {
-			c.JSON(http.StatusForbidden, BaseError(database.UserPwdError))
+			c.JSON(http.StatusForbidden, *BaseError(database.UserPwdError))
 			return
 		}
 		c.JSON(http.StatusOK, UserUpdate{*BaseError(errs.NoError), UserUpdateResult{token}})

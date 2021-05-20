@@ -14,3 +14,5 @@ var CgMinerDeviceError = errs.Definition(676, "CGMiner devices exception") //
 var UpdateFregError = errs.Definition(677, "CGMiner UpdateFregError")      //
 var UpdateVolError = errs.Definition(678, "CGMiner UpdateVolError")        //
 var IpConflict = errs.Definition(679, "Ip Conflict")                       //
+var ErrToken = errs.Definition(680, "token error")
+var ErrTooManyRetries = errs.Definition(681, "Too many retries")

@@ -50,18 +50,18 @@ func (v Devs) ApiCmd() string {
 	"DEVS": [{
 		"ASC": 0,
 		"Name": "IT1",
-		"ID": 0, // TODO 序号
+		"ID": 0, //  序号
 		"Enabled": "Y",
-		"Status": "Alive", //TODO
-		"Temperature": 0.00, //TODO
+		"Status": "Alive", //
+		"Temperature": 0.00, //
 		"MHS av": 42854.64,
 		"MHS 5s": 42856.93,
 		"MHS 1m": 42856.46,
 		"MHS 5m": 42856.30,
-		"MHS 15m": 42856.30, //TODO 实时算力 5秒刷一次 g/h  t/t
-		"Accepted": 0, //TODO
-		"Rejected": 0, //TODO
-		"Hardware Errors": 0, //TODO 硬件错误
+		"MHS 15m": 42856.30, // 实时算力 5秒刷一次 g/h  t/t
+		"Accepted": 0, //
+		"Rejected": 0, //
+		"Hardware Errors": 0, // 硬件错误
 		"Utility": 0.00,
 		"Last Share Pool": -1,
 		"Last Share Time": 0,
