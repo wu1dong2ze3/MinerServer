@@ -13,6 +13,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -70,21 +71,33 @@ func htmlRouter() *gin.Engine {
 	e := gin.New()
 	e.Use(gin.Logger(), gin.Recovery(), func(c *gin.Context) {
 		fmt.Println("htmlRouter", c.Request.URL.Path)
-		if c.Request.URL.Path == "/host" {
-			c.Header("Access-Control-Allow-Origin", "*")
-			c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-			c.Header("Access-Control-Allow-Headers", "Content-Type, AccessToken, X-CSRF-Token, Authorization, Token")
-			c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
-			c.Header("Access-Control-Allow-Credentials", "true")
-			if ip := getIp(); ip == "" {
-				fmt.Println("host get ip is null! error!")
-				c.JSON(200, *httpapi.BaseError(errs.UnknowError.AddByString("ip is null????")))
-			} else {
-				log.Println("ip:", ip)
-				c.JSON(200, PortResult{httpapi.BaseJson{Code: 200}, Result{ip + ":" + ApiPort, ApiPort, ip}})
-			}
-		} else {
+		switch c.Request.URL.Path {
+		case "/":
 			c.Next()
+		default:
+			if strings.Contains(c.Request.URL.Path, ".") {
+				c.Next()
+				return
+			} else if strings.Contains(c.Request.URL.Path, "/host") {
+				c.Header("Access-Control-Allow-Origin", "*")
+				c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+				c.Header("Access-Control-Allow-Headers", "Content-Type, AccessToken, X-CSRF-Token, Authorization, Token")
+				c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+				c.Header("Access-Control-Allow-Credentials", "true")
+				if ip := getIp(); ip == "" {
+					fmt.Println("host get ip is null! error!")
+					c.JSON(200, *httpapi.BaseError(errs.UnknowError.AddByString("ip is null????")))
+				} else {
+					log.Println("ip:", ip)
+					c.JSON(200, PortResult{httpapi.BaseJson{Code: 200}, Result{ip + ":" + ApiPort, ApiPort, ip}})
+				}
+				return
+			} else {
+				fmt.Println("htmlRouter changed " + c.Request.URL.Path + " to " + " /")
+				c.Request.URL.Path = "/"
+				e.HandleContext(c)
+				return
+			}
 		}
 	})
 	e.StaticFS("/", http.Dir(path+"/static"))

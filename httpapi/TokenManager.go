@@ -65,13 +65,18 @@ func (tkm TKM) Check(tkString string) bool {
 		log.Println("Check error!", tkString)
 		return false
 	}
-	if tk := parse(tkString); tk != nil {
-		if tk.User == mToken.User || tk.Pwd == mToken.Pwd {
-			//暂时不校验超时
-			return true
-		}
+	//TODO 修改为全码校验
+	//if tk := parse(tkString); tk != nil {
+	//	if tk.User == mToken.User || tk.Pwd == mToken.Pwd {
+	//		//暂时不校验超时
+	//		return true
+	//	}
+	//}
+	if mTkString != tkString && tkString != "" {
+		log.Println("Check error!mTkString="+mTkString, "tkString="+tkString)
+		return false
 	}
-	return false
+	return true
 }
 
 func parse(tkString string) *Token {
@@ -106,6 +111,6 @@ func getTokenString(token *Token) (string, error) {
 		"Time": mToken.time.Format(time.UnixDate),
 	})
 	tokenString, err := tk.SignedString([]byte(key))
-	fmt.Println(tokenString, err)
+	fmt.Println("getTokenString="+tokenString, err)
 	return tokenString, err
 }

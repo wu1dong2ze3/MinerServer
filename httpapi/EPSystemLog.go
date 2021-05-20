@@ -43,7 +43,8 @@ var upGrader = websocket.Upgrader{
 
 func (SystemLog) GetHandle() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println("/system/log=begin")
+		tk := c.Query("token")
+		log.Println("/system/log=begin tk=", tk)
 		if websocket.IsWebSocketUpgrade(c.Request) {
 			ws, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 			if err != nil {

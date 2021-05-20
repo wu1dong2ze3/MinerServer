@@ -73,18 +73,20 @@ func userAuthorization() gin.HandlerFunc {
 		case "OPTIONS":
 			c.AbortWithStatus(http.StatusNoContent)
 		case "GET", "POST":
-			//TODO 正式版本 需要用户权限校验
-			//var v = &UserLogin{}
-			//if c.Request.URL.Path == v.GetSubPath() {
-			//} else {
-			//	token := c.GetHeader("token")
-			//	log.Println("userAuthorization:", c.Request.URL.Path)
-			//	if !InstanceTKM().Check(token) {
-			//		log.Println("userAuthorization failed:", c.Request.URL.Path, "token=", token)
-			//		c.JSON(http.StatusUnauthorized, *BaseError(ErrToken))
-			//		return
-			//	}
-			//}
+			var v = &UserLogin{}
+			var l = &SystemLog{}
+			if c.Request.URL.Path == v.GetSubPath() || c.Request.URL.Path == l.GetSubPath() {
+				//日志和登陆忽略权限校验
+			} else {
+				token := c.GetHeader("token")
+				log.Println("userAuthorization:", c.Request.URL.Path, "tk="+token)
+				if !InstanceTKM().Check(token) {
+					log.Println("userAuthorization failed!")
+					c.Abort()
+					c.JSON(http.StatusOK, *BaseError(ErrToken))
+					return
+				}
+			}
 		}
 		log.Println("userAuthorization", c.FullPath())
 		c.Next()
